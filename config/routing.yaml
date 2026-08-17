@@ -1,0 +1,96 @@
+# Model Plane — Routing Configuration
+# Custom scorer weights, task routing rules, and policy thresholds.
+# Do NOT put provider credentials here.
+
+# ── 14-dimension scorer weights ─────────────────────────────────────────────
+# Must sum to 1.0 (normalised automatically if they don't).
+scorer_weights:
+  reasoning_markers: 0.18
+  code_presence: 0.15
+  simple_indicators: 0.12
+  multi_step_patterns: 0.12
+  technical_terms: 0.10
+  token_count: 0.08
+  creative_markers: 0.05
+  question_complexity: 0.05
+  constraint_count: 0.04
+  imperative_verbs: 0.03
+  output_format: 0.03
+  domain_specificity: 0.02
+  reference_complexity: 0.02
+  negation_complexity: 0.01
+
+# ── tier → default deployment preference ────────────────────────────────────
+# Point at the providers you actually have credentials for.
+# Swap back to local-* or openai-* once you have those keys.
+tier_defaults:
+  simple: watsonx-granite-small       # ibm/granite-3-1-8b-base
+  medium: watsonx-granite-medium      # ibm/granite-4-h-small
+  complex: watsonx-mistral-large      # mistral-large-2512
+  reasoning: watsonx-granite-large    # llama-3-3-70b-instruct
+
+# ── provider preference order (used to break scoring ties) ───────────────────
+# First matching provider wins when candidates have equal scores.
+preferred_providers:
+  - watsonx
+  - local
+  - anthropic
+  - openai
+
+# ── task-type overrides (highest priority, bypasses tier) ────────────────────
+task_overrides:
+  code_debugging:
+    preferred_deployments: [watsonx-granite-large, watsonx-mistral-medium]
+  code_generation:
+    preferred_deployments: [watsonx-granite-large, watsonx-mistral-medium]
+  mathematical_reasoning:
+    preferred_deployments: [watsonx-granite-large, watsonx-mistral-large]
+  technical_reasoning:
+    preferred_deployments: [watsonx-mistral-large, watsonx-granite-large]
+  long_context_synthesis:
+    preferred_deployments: [watsonx-granite-large, watsonx-mistral-large]
+  structured_extraction:
+    preferred_deployments: [watsonx-mistral-medium, watsonx-granite-medium]
+
+# ── routing thresholds ───────────────────────────────────────────────────────
+thresholds:
+  ml_confidence_min: 0.70          # below this, ignore ML recommendation
+  routing_confidence_low: 0.45     # below this, log a warning
+  complexity_score_simple: 0.25    # below → SIMPLE tier
+  complexity_score_complex: 0.55   # above → COMPLEX tier
+  complexity_score_reasoning: 0.75 # above → REASONING tier
+
+# ── tenant policies ──────────────────────────────────────────────────────────
+tenant_policies:
+  - tenant_id: regulated-tenant-1
+    allowed_providers: [watsonx]
+    regulated_tasks: [structured_extraction, planning]
+    regulated_deployment: watsonx-granite-medium
+    max_tokens_per_request: 32768
+
+  - tenant_id: cost-sensitive-tenant
+    allowed_providers: [local, openai]
+    denied_deployments: [anthropic-sonnet, anthropic-sonnet-thinking]
+    max_cost_per_request: 0.05
+
+# ── compression profiles per task type ──────────────────────────────────────
+compression_profiles:
+  code_generation: code_context_reduction
+  code_editing: code_context_reduction
+  code_debugging: code_context_reduction
+  repository_search: code_context_reduction
+  tool_call_interpretation: tool_output_compaction
+  long_context_synthesis: conversation_summary
+  summarization: passthrough
+  default: auto
+
+# ── escalation / fallback policy ────────────────────────────────────────────
+escalation:
+  max_retries: 2
+  escalate_on_schema_fail: true
+  escalate_on_tool_fail: true
+  # Ordered fallback chain used when validation fails
+  fallback_chain:
+    - watsonx-mistral-large
+    - watsonx-granite-large
+    - watsonx-granite-medium
