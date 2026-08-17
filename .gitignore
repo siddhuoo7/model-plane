@@ -32,9 +32,9 @@ coverage.xml
 .mypy_cache/
 
 # Data & models (generated artifacts)
-model_plane/data/training_data.csv
-model_plane/data/similarity_index.npy
-models/router_ml.joblib
+# model_plane/data/training_data.csv
+# model_plane/data/similarity_index.npy
+# models/router_ml.joblib
 
 # Logs
 *.log
