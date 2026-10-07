@@ -23,12 +23,48 @@ class TaskType(str, Enum):
     UNKNOWN = "unknown"
 
 
+# Canonical ordering index for ComplexityTier comparisons.
+_TIER_ORDER: dict[str, int] = {
+    "simple":    0,
+    "medium":    1,
+    "complex":   2,
+    "reasoning": 3,
+}
+
+
 class ComplexityTier(str, Enum):
-    """Coarse routing tier derived from scorer output."""
+    """Coarse routing tier derived from scorer output.
+
+    Supports ordering comparisons (``<``, ``<=``, ``>``, ``>=``) based on
+    increasing complexity: SIMPLE < MEDIUM < COMPLEX < REASONING.
+    """
     SIMPLE = "simple"
     MEDIUM = "medium"
     COMPLEX = "complex"
     REASONING = "reasoning"
+
+    def _rank(self) -> int:
+        return _TIER_ORDER[self.value]
+
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, ComplexityTier):
+            return NotImplemented
+        return self._rank() < other._rank()
+
+    def __le__(self, other: object) -> bool:
+        if not isinstance(other, ComplexityTier):
+            return NotImplemented
+        return self._rank() <= other._rank()
+
+    def __gt__(self, other: object) -> bool:
+        if not isinstance(other, ComplexityTier):
+            return NotImplemented
+        return self._rank() > other._rank()
+
+    def __ge__(self, other: object) -> bool:
+        if not isinstance(other, ComplexityTier):
+            return NotImplemented
+        return self._rank() >= other._rank()
 
 
 # Map task types to their natural complexity tier (can be overridden by scorer)

@@ -168,12 +168,59 @@ def compress(
     profile: str,
     context_budget: int | None = None,
     task_type: str | None = None,
+    context_reuse_score: float = 0.0,
     **kwargs: Any,
 ) -> CompressionResult:
-    """Apply the named compression profile to messages."""
+    """Apply the named compression profile to messages.
+
+    Cache-aware gate (§16 of research doc):
+    If the session has a high context_reuse_score the request's prefix is
+    likely already cached on the warm provider.  Compressing it would
+    invalidate the cache hit, costing more in re-prefill than it saves in
+    reduced input tokens.  When context_reuse_score exceeds
+    CACHE_AWARE_COMPRESSION_THRESHOLD we pass through unmodified so the
+    prefix cache remains intact.
+    """
+    from model_plane.runtime_overrides import compression_overrides as _ov
+
     tokens_before = sum(_msg_tokens(m) for m in messages)
 
-    if not settings.compression_enabled or profile == "passthrough":
+    # Resolve live overrides — runtime_overrides dict wins over env/settings.
+    _enabled: bool = bool(_ov.get("enabled", settings.compression_enabled))
+    _cache_gate: bool = bool(_ov.get("cache_aware_gate_enabled", settings.context_reuse_enabled))
+    _cache_threshold: float = float(_ov.get("cache_aware_threshold", 0.60))
+
+    # Honour profile override from the admin UI (replaces the caller-supplied profile).
+    _profile_override = str(_ov.get("profile", "")) if _ov.get("profile") else None
+    if _profile_override and _profile_override != "auto":
+        profile = _profile_override
+    elif _profile_override == "auto" and profile not in ("auto", "passthrough"):
+        # Caller already resolved to a concrete profile — keep it.
+        pass
+
+    # Honour token-threshold override.
+    if "token_threshold" in _ov:
+        kwargs.setdefault("target_budget", int(_ov["token_threshold"]))
+
+    # Cache-aware gate: skip compression when the session prefix is warm.
+    if (
+        _cache_gate
+        and context_reuse_score >= _cache_threshold
+    ):
+        log.debug(
+            "compression_skipped_cache_warm",
+            context_reuse_score=round(context_reuse_score, 3),
+            threshold=_cache_threshold,
+        )
+        return CompressionResult(
+            messages=messages,
+            tokens_before=tokens_before,
+            tokens_after=tokens_before,
+            profile_used="passthrough",
+            cache_prefix_preserved=True,
+        )
+
+    if not _enabled or profile == "passthrough":
         return CompressionResult(
             messages=messages,
             tokens_before=tokens_before,

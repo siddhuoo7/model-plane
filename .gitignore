@@ -19,6 +19,16 @@ env/
 # Environment / secrets
 .env.local
 .env.*.local
+*.pem
+*.key
+*.crt
+openshift-ingress-ca.crt
+
+# Database & SQLite files
+config/model_plane.db
+*.db
+*.sqlite
+*.sqlite3
 
 # Test & coverage
 .pytest_cache/
@@ -31,10 +41,17 @@ coverage.xml
 .ruff_cache/
 .mypy_cache/
 
-# Data & models (generated artifacts)
-# model_plane/data/training_data.csv
-# model_plane/data/similarity_index.npy
-# models/router_ml.joblib
+# Generated HTML / temp reports
+router-comparison-*.html
+what-to-adopt-*.html
+*.html.tmp
+
+# Node / Frontend
+node_modules/
+node_modules
+dist/
+.npm
+.pnpm-store/
 
 # Logs
 *.log

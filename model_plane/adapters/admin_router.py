@@ -142,7 +142,7 @@ async def routing_explain(
         "routing_source": decision.source,
         "routing_confidence": round(decision.confidence, 4),
         "task_override_used": bool(
-            (settings.load_routing_config().get("task_overrides", {}))
+            (settings.load_routing_config().get("task_deployment_overrides", {}))
             .get(classification.task_type.value if classification else "", {})
             .get("preferred_deployments")
         ),

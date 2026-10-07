@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import tiktoken
+
+if TYPE_CHECKING:
+    from model_plane.classifier.taxonomy import TaskType
 
 
 @dataclass
@@ -43,9 +46,14 @@ class RequestFeatures:
     has_images: bool = False
     language_hint: str | None = None
 
-    def as_vector(self) -> list[float]:
-        """Return the 14 signals as an ordered float vector (for ML models)."""
-        return [
+    def as_vector(self, task_type: "TaskType | None" = None) -> list[float]:
+        """Return the feature vector for ML models.
+
+        Returns 14 floats by default.  When ``settings.features_15_dim_enabled``
+        is ``True`` and *task_type* is provided, a 15th dimension
+        (``task_type_tier_signal``) is appended.
+        """
+        vec = [
             self.reasoning_markers,
             self.code_presence,
             self.simple_indicators,
@@ -61,21 +69,73 @@ class RequestFeatures:
             self.reference_complexity,
             self.negation_complexity,
         ]
+        if task_type is not None:
+            from model_plane.config import settings  # local import avoids circular dep
+            if settings.features_15_dim_enabled:
+                vec.append(_get_task_tier_signal().get(task_type, 0.3))
+        return vec
+
+
+# ── 15th-dimension task-tier signal ──────────────────────────────────────────
+# Maps each TaskType to a float in [0, 1] representing how much compute the
+# task typically demands.  Used as dim[14] when FEATURES_15_DIM_ENABLED=true.
+# Values from docs/03-migration-guide.md §2a.
+
+def _build_task_tier_signal() -> "dict[TaskType, float]":
+    from model_plane.classifier.taxonomy import TaskType  # deferred to avoid circular import
+    return {
+        TaskType.SIMPLE_QA:               0.0,
+        TaskType.SUMMARIZATION:           0.1,
+        TaskType.TRANSLATION:             0.1,
+        TaskType.CREATIVE_WRITING:        0.4,
+        TaskType.CODE_GENERATION:         0.6,
+        TaskType.CODE_EDITING:            0.6,
+        TaskType.CODE_DEBUGGING:          0.6,
+        TaskType.MATHEMATICAL_REASONING:  0.8,
+        TaskType.TECHNICAL_REASONING:     0.8,
+        TaskType.REPOSITORY_SEARCH:       0.5,
+        TaskType.LONG_CONTEXT_SYNTHESIS:  0.7,
+        TaskType.PLANNING:                0.7,
+        TaskType.TOOL_CALL_INTERPRETATION: 0.3,
+        TaskType.STRUCTURED_EXTRACTION:   0.3,
+        TaskType.UNKNOWN:                 0.3,
+    }
+
+
+# Lazily populated on first use so module-level import of taxonomy is not
+# required at import time (prevents circular-import issues).
+TASK_TIER_SIGNAL: "dict[TaskType, float]" = {}  # type: ignore[assignment]
+
+
+def _get_task_tier_signal() -> "dict[TaskType, float]":
+    global TASK_TIER_SIGNAL
+    if not TASK_TIER_SIGNAL:
+        TASK_TIER_SIGNAL = _build_task_tier_signal()
+    return TASK_TIER_SIGNAL
 
 
 # ── regex patterns ───────────────────────────────────────────────────────────
 
 _RE_CODE_BLOCK = re.compile(r"```[\s\S]*?```|`[^`]+`")
+# Raw code patterns: Python/JS/TS keywords and typical constructs that appear
+# without markdown fences (e.g. pasted snippets, inline imports).
+_RE_RAW_CODE = re.compile(
+    r"\b(def |class |import |from \w+ import|async def |await |lambda |"
+    r"const |let |var |function |return |yield |raise |except |try:|finally:|"
+    r"for .+? in |while |elif |#.*\n|//|/\*|\*\/|printf|std::|->|:=)\b",
+    re.I,
+)
 _RE_REASONING = re.compile(
     r"\b(reason|analyze|explain why|derive|infer|deduce|prove|hypothesis|"
     r"step.by.step|think through|chain of thought|because|therefore|thus|hence)\b",
     re.I,
 )
 _RE_SIMPLE = re.compile(
-    # Exact factual lookups only — NOT "list" or "name" alone (too ambiguous)
+    # Exact factual lookups and greetings
     r"\b(what is|what are|who is|who was|when did|when was|where is|where was|"
     r"define |how many|how much|yes or no|true or false|spell out|"
-    r"what does .{0,20} stand for|what does .{0,20} mean)\b",
+    r"what does .{0,20} stand for|what does .{0,20} mean|"
+    r"hi |hello|hey |good morning|good afternoon|how are you|nice to meet)\b",
     re.I,
 )
 _RE_MULTI_STEP = re.compile(
@@ -185,7 +245,12 @@ def extract_features(request: dict[str, Any]) -> RequestFeatures:
         has_images=has_images,
         # 14 dimensions
         reasoning_markers=_norm(len(_RE_REASONING.findall(last_user)), 5),
-        code_presence=_norm(code_blocks + len(_RE_CODE_BLOCK.findall(last_user)), 3),
+        code_presence=_norm(
+            code_blocks
+            + len(_RE_CODE_BLOCK.findall(last_user))
+            + len(_RE_RAW_CODE.findall(full_text)),
+            3,
+        ),
         simple_indicators=_norm(len(_RE_SIMPLE.findall(last_user)), 3),
         multi_step_patterns=_norm(len(_RE_MULTI_STEP.findall(last_user)), 4),
         technical_terms=_norm(len(_RE_TECHNICAL.findall(full_text)), 6),

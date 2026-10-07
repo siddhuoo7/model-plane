@@ -1,220 +1,651 @@
-# Model Plane — Model Catalog
-# Each entry is a LiteLLM-resolvable deployment.
-# Keep provider credentials in env vars, never in this file.
-
 deployments:
-  # ── Local / self-hosted ──────────────────────────────────────────────────
-  # Uncomment and set LOCAL_*_API_BASE in .env when you have a local vLLM/Ollama running.
-  # - name: local-small
-  #   litellm_model: openai/mistral-7b-instruct
-  #   provider: local
-  #   api_base_env: LOCAL_SMALL_API_BASE      # set LOCAL_SMALL_API_BASE=http://localhost:11434/v1
-  #   api_key_env: LOCAL_SMALL_API_KEY
-  #   context_limit: 8192
-  #   cost_per_1k_input: 0.0
-  #   cost_per_1k_output: 0.0
-  #   tier: small
-  #   capabilities: [text, summarization]
-  #   tags: [local, fast]
-  #   fallback_to: [watsonx-granite-small]
-  #   max_parallel_requests: 100
-
-  # ── OpenAI ───────────────────────────────────────────────────────────────
-  - name: openai-gpt4o-mini
-    litellm_model: gpt-4o-mini
-    provider: openai
-    api_key_env: OPENAI_API_KEY
-    context_limit: 128000
-    cost_per_1k_input: 0.00015
-    cost_per_1k_output: 0.0006
-    tier: medium
-    capabilities:
-      - text
-      - code
-      - function-calling
-      - json-mode
-    tags: [openai, fast]
-    fallback_to: [anthropic-haiku]
-    rpm: 500
-
-  - name: openai-gpt4o
-    litellm_model: gpt-4o
-    provider: openai
-    api_key_env: OPENAI_API_KEY
-    context_limit: 128000
-    cost_per_1k_input: 0.005
-    cost_per_1k_output: 0.015
-    tier: complex
-    capabilities:
-      - text
-      - code
-      - function-calling
-      - json-mode
-      - vision
-      - long-context
-    tags: [openai]
-    fallback_to: [anthropic-sonnet]
-    rpm: 200
-
-  - name: openai-o1-mini
-    litellm_model: o1-mini
-    provider: openai
-    api_key_env: OPENAI_API_KEY
-    context_limit: 128000
-    cost_per_1k_input: 0.003
-    cost_per_1k_output: 0.012
-    tier: reasoning
-    capabilities:
-      - reasoning
-      - math
-      - code
-    tags: [openai, reasoning]
-    fallback_to: [anthropic-sonnet-thinking]
-    rpm: 100
-
-  # ── Anthropic ────────────────────────────────────────────────────────────
-  - name: anthropic-haiku
-    litellm_model: anthropic/claude-3-haiku-20240307
-    provider: anthropic
-    api_key_env: ANTHROPIC_API_KEY
-    context_limit: 200000
-    cost_per_1k_input: 0.00025
-    cost_per_1k_output: 0.00125
-    tier: small
-    capabilities:
-      - text
-      - function-calling
-      - long-context
-    tags: [anthropic, fast]
-    fallback_to: [openai-gpt4o-mini]
-    rpm: 1000
-
-  - name: anthropic-sonnet
-    litellm_model: anthropic/claude-3-5-sonnet-20241022
-    provider: anthropic
-    api_key_env: ANTHROPIC_API_KEY
-    context_limit: 200000
-    cost_per_1k_input: 0.003
-    cost_per_1k_output: 0.015
-    tier: complex
-    capabilities:
-      - text
-      - code
-      - function-calling
-      - long-context
-      - vision
-    tags: [anthropic, coding]
-    fallback_to: [openai-gpt4o]
-    rpm: 200
-
-  - name: anthropic-sonnet-thinking
-    litellm_model: anthropic/claude-3-7-sonnet-20250219
-    provider: anthropic
-    api_key_env: ANTHROPIC_API_KEY
-    context_limit: 200000
-    cost_per_1k_input: 0.003
-    cost_per_1k_output: 0.015
-    tier: reasoning
-    capabilities:
-      - reasoning
-      - code
-      - long-context
-    tags: [anthropic, reasoning]
-    fallback_to: [openai-o1-mini]
-    rpm: 100
-
-  # ── IBM watsonx.ai ────────────────────────────────────────────────────────
-  # Model IDs verified live against the watsonx foundation_model_specs API.
-  # Requires env vars: WATSONX_APIKEY, WATSONX_PROJECT_ID, WATSONX_URL
-
-  - name: watsonx-granite-small
-    litellm_model: watsonx/ibm/granite-4-h-small   # granite-3-1-8b-base is text-gen only, not chat
-    provider: watsonx
-    api_key_env: WATSONX_APIKEY
-    context_limit: 20480
-    cost_per_1k_input: 0.0003
-    cost_per_1k_output: 0.0009
-    tier: small
-    capabilities:
-      - text
-      - summarization
-      - code
-      - function-calling
-      - json-mode
-    tags: [watsonx, sovereign]
-    fallback_to: [watsonx-granite-medium]
-    max_parallel_requests: 50
-
-  - name: watsonx-granite-medium
-    litellm_model: watsonx/ibm/granite-4-h-small
-    provider: watsonx
-    api_key_env: WATSONX_APIKEY
-    context_limit: 20480
-    cost_per_1k_input: 0.0005
-    cost_per_1k_output: 0.0015
-    tier: medium
-    capabilities:
-      - text
-      - code
-      - structured_extraction
-      - function-calling
-      - json-mode
-      - long-context
-    tags: [watsonx, sovereign]
-    fallback_to: [watsonx-granite-small]
-    max_parallel_requests: 30
-
-  - name: watsonx-granite-large
-    litellm_model: watsonx/meta-llama/llama-3-3-70b-instruct
-    provider: watsonx
-    api_key_env: WATSONX_APIKEY
-    context_limit: 128000
-    cost_per_1k_input: 0.0009
-    cost_per_1k_output: 0.0009
-    tier: complex
-    capabilities:
-      - text
-      - code
-      - structured_extraction
-      - function-calling
-      - long-context
-      - reasoning
-    tags: [watsonx, sovereign]
-    fallback_to: [watsonx-granite-medium]
-    max_parallel_requests: 20
-
-  - name: watsonx-mistral-medium
-    litellm_model: watsonx/mistralai/mistral-small-3-1-24b-instruct-2503
-    provider: watsonx
-    api_key_env: WATSONX_APIKEY
-    context_limit: 32768
-    cost_per_1k_input: 0.0006
-    cost_per_1k_output: 0.0018
-    tier: medium
-    capabilities:
-      - text
-      - code
-      - function-calling
-      - json-mode
-    tags: [watsonx, sovereign]
-    fallback_to: [watsonx-granite-medium]
-    max_parallel_requests: 20
-
-  - name: watsonx-mistral-large
-    litellm_model: watsonx/mistral-large-2512
-    provider: watsonx
-    api_key_env: WATSONX_APIKEY
-    context_limit: 128000
-    cost_per_1k_input: 0.002
-    cost_per_1k_output: 0.006
-    tier: complex
-    capabilities:
-      - text
-      - code
-      - function-calling
-      - json-mode
-      - long-context
-      - reasoning
-    tags: [watsonx, sovereign]
-    fallback_to: [watsonx-granite-large]
-    max_parallel_requests: 10
+- name: openai-gpt4o-mini
+  litellm_model: openai/gpt-4o-mini
+  provider: openai
+  tier: simple
+  context_limit: 128000
+  cost_per_1k_input: 0.00015
+  cost_per_1k_output: 0.0006
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  tags:
+  - openai
+  - fast
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-medium
+  healthy: true
+  api_key_env: OPENAI_API_KEY
+  rpm: 500
+  cache_read_per_1k: 7.5e-05
+- name: openai-gpt4.1-nano
+  litellm_model: openai/gpt-4.1-nano
+  provider: openai
+  tier: simple
+  context_limit: 1047576
+  cost_per_1k_input: 0.0001
+  cost_per_1k_output: 0.0004
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  tags:
+  - openai
+  - fast
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-small
+  healthy: true
+  api_key_env: OPENAI_API_KEY
+  cache_read_per_1k: 2.5e-05
+- name: openai-gpt5-nano
+  litellm_model: openai/gpt-5-nano
+  provider: openai
+  tier: simple
+  context_limit: 128000
+  cost_per_1k_input: 5.0e-05
+  cost_per_1k_output: 0.0004
+  capabilities:
+  - chat
+  - json-mode
+  tags:
+  - openai
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-small
+  healthy: true
+  api_key_env: OPENAI_API_KEY
+  cache_read_per_1k: 5.0e-06
+- name: openai-gpt4.1-mini
+  litellm_model: openai/gpt-4.1-mini
+  provider: openai
+  tier: medium
+  context_limit: 1047576
+  cost_per_1k_input: 0.0004
+  cost_per_1k_output: 0.0016
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  - long-context
+  tags:
+  - openai
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-medium
+  healthy: true
+  api_key_env: OPENAI_API_KEY
+  cache_read_per_1k: 0.0001
+- name: openai-gpt5-mini
+  litellm_model: openai/gpt-5-mini
+  provider: openai
+  tier: medium
+  context_limit: 128000
+  cost_per_1k_input: 0.00025
+  cost_per_1k_output: 0.002
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  tags:
+  - openai
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-medium
+  healthy: true
+  api_key_env: OPENAI_API_KEY
+  cache_read_per_1k: 2.5e-05
+- name: openai-gpt4o
+  litellm_model: openai/gpt-4o
+  provider: openai
+  tier: complex
+  context_limit: 128000
+  cost_per_1k_input: 0.0025
+  cost_per_1k_output: 0.01
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  - reasoning
+  - long-context
+  tags:
+  - openai
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-large
+  healthy: true
+  api_key_env: OPENAI_API_KEY
+  rpm: 200
+  cache_read_per_1k: 0.00125
+- name: openai-gpt4.1
+  litellm_model: openai/gpt-4.1
+  provider: openai
+  tier: complex
+  context_limit: 1047576
+  cost_per_1k_input: 0.002
+  cost_per_1k_output: 0.008
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  - reasoning
+  - long-context
+  tags:
+  - openai
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-large
+  healthy: true
+  api_key_env: OPENAI_API_KEY
+  cache_read_per_1k: 0.0005
+- name: openai-gpt5
+  litellm_model: openai/gpt-5
+  provider: openai
+  tier: complex
+  context_limit: 128000
+  cost_per_1k_input: 0.00125
+  cost_per_1k_output: 0.01
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  - reasoning
+  - long-context
+  tags:
+  - openai
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-large
+  healthy: true
+  api_key_env: OPENAI_API_KEY
+  cache_read_per_1k: 0.000125
+- name: openai-o4-mini
+  litellm_model: openai/o4-mini
+  provider: openai
+  tier: reasoning
+  context_limit: 200000
+  cost_per_1k_input: 0.0011
+  cost_per_1k_output: 0.0044
+  capabilities:
+  - chat
+  - function-calling
+  - reasoning
+  - math
+  - code
+  tags:
+  - openai
+  - reasoning
+  max_parallel_requests: 50
+  fallback_to:
+  - bedrock-deepseek-r1
+  healthy: true
+  api_key_env: OPENAI_API_KEY
+  cache_read_per_1k: 0.000275
+- name: openai-o3
+  litellm_model: openai/o3
+  provider: openai
+  tier: reasoning
+  context_limit: 200000
+  cost_per_1k_input: 0.002
+  cost_per_1k_output: 0.008
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  - reasoning
+  - math
+  - code
+  tags:
+  - openai
+  - reasoning
+  max_parallel_requests: 50
+  fallback_to:
+  - bedrock-deepseek-r1
+  healthy: true
+  api_key_env: OPENAI_API_KEY
+  rpm: 100
+  cache_read_per_1k: 0.0005
+- name: anthropic-haiku-45
+  litellm_model: anthropic/claude-haiku-4-5-20251001
+  provider: anthropic
+  tier: simple
+  context_limit: 200000
+  cost_per_1k_input: 0.0008
+  cost_per_1k_output: 0.004
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  tags:
+  - anthropic
+  - fast
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-medium
+  healthy: true
+  api_key_env: ANTHROPIC_API_KEY
+  rpm: 1000
+  cache_read_per_1k: 8.0e-05
+  cache_write_per_1k: 0.001
+- name: anthropic-sonnet-45
+  litellm_model: anthropic/claude-sonnet-4-5-20250929
+  provider: anthropic
+  tier: medium
+  context_limit: 200000
+  cost_per_1k_input: 0.003
+  cost_per_1k_output: 0.015
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  - reasoning
+  - long-context
+  tags:
+  - anthropic
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-large
+  healthy: true
+  api_key_env: ANTHROPIC_API_KEY
+  cache_read_per_1k: 0.0003
+  cache_write_per_1k: 0.00375
+- name: anthropic-opus-45
+  litellm_model: anthropic/claude-opus-4-5-20251101
+  provider: anthropic
+  tier: complex
+  context_limit: 200000
+  cost_per_1k_input: 0.015
+  cost_per_1k_output: 0.075
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  - reasoning
+  - long-context
+  tags:
+  - anthropic
+  max_parallel_requests: 20
+  fallback_to:
+  - watsonx-granite-large
+  healthy: true
+  api_key_env: ANTHROPIC_API_KEY
+  cache_read_per_1k: 0.0015
+  cache_write_per_1k: 0.01875
+- name: anthropic-opus-5
+  litellm_model: anthropic/claude-opus-5
+  provider: anthropic
+  tier: reasoning
+  context_limit: 200000
+  cost_per_1k_input: 0.015
+  cost_per_1k_output: 0.075
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  - reasoning
+  - long-context
+  tags:
+  - anthropic
+  - reasoning
+  max_parallel_requests: 10
+  fallback_to:
+  - bedrock-deepseek-r1
+  healthy: true
+  api_key_env: ANTHROPIC_API_KEY
+  rpm: 50
+  cache_read_per_1k: 0.0015
+  cache_write_per_1k: 0.01875
+- name: watsonx-granite-small
+  litellm_model: watsonx/ibm/granite-4-h-small
+  provider: watsonx
+  tier: simple
+  context_limit: 8192
+  cost_per_1k_input: 6.36e-05
+  cost_per_1k_output: 0.000265
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  tags:
+  - watsonx
+  - sovereign
+  max_parallel_requests: 50
+  fallback_to: []
+  healthy: true
+  api_key_env: WATSONX_APIKEY
+- name: watsonx-granite-medium
+  litellm_model: watsonx/ibm/granite-4-h-small
+  provider: watsonx
+  tier: medium
+  context_limit: 8192
+  cost_per_1k_input: 6.36e-05
+  cost_per_1k_output: 0.000265
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  tags:
+  - watsonx
+  - sovereign
+  max_parallel_requests: 30
+  fallback_to:
+  - watsonx-granite-small
+  healthy: true
+  api_key_env: WATSONX_APIKEY
+- name: watsonx-granite-large
+  litellm_model: watsonx/meta-llama/llama-3-3-70b-instruct
+  provider: watsonx
+  tier: complex
+  context_limit: 131072
+  cost_per_1k_input: 0.0007526
+  cost_per_1k_output: 0.0007526
+  capabilities:
+  - chat
+  - function-calling
+  - reasoning
+  - math
+  tags:
+  - watsonx
+  - sovereign
+  max_parallel_requests: 20
+  fallback_to:
+  - watsonx-granite-medium
+  healthy: true
+  api_key_env: WATSONX_APIKEY
+- name: watsonx-llama4-maverick
+  litellm_model: watsonx/meta-llama/llama-4-maverick-17b-128e-instruct-fp8
+  provider: watsonx
+  tier: complex
+  context_limit: 1000000
+  cost_per_1k_input: 0.000371
+  cost_per_1k_output: 0.001484
+  capabilities:
+  - chat
+  - function-calling
+  - reasoning
+  - long-context
+  tags:
+  - watsonx
+  - sovereign
+  max_parallel_requests: 20
+  fallback_to:
+  - watsonx-granite-large
+  healthy: true
+  api_key_env: WATSONX_APIKEY
+- name: watsonx-mistral-medium
+  litellm_model: watsonx/mistralai/mistral-small-3-1-24b-instruct-2503
+  provider: watsonx
+  tier: medium
+  context_limit: 32768
+  cost_per_1k_input: 0.000106
+  cost_per_1k_output: 0.000318
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  tags:
+  - watsonx
+  - sovereign
+  max_parallel_requests: 20
+  fallback_to:
+  - watsonx-granite-medium
+  healthy: true
+  api_key_env: WATSONX_APIKEY
+- name: watsonx-mistral-large
+  litellm_model: watsonx/mistral-large-2512
+  provider: watsonx
+  tier: complex
+  context_limit: 131072
+  cost_per_1k_input: 0.000636
+  cost_per_1k_output: 0.001908
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  - reasoning
+  tags:
+  - watsonx
+  - sovereign
+  max_parallel_requests: 10
+  fallback_to:
+  - watsonx-granite-large
+  healthy: true
+  api_key_env: WATSONX_APIKEY
+- name: bedrock-claude-haiku-45
+  litellm_model: bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0
+  provider: bedrock
+  tier: simple
+  context_limit: 200000
+  cost_per_1k_input: 0.001
+  cost_per_1k_output: 0.005
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  tags:
+  - bedrock
+  - aws
+  - anthropic
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-medium
+  healthy: true
+- name: bedrock-claude-sonnet-45
+  litellm_model: bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0
+  provider: bedrock
+  tier: complex
+  context_limit: 200000
+  cost_per_1k_input: 0.003
+  cost_per_1k_output: 0.015
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  - reasoning
+  - long-context
+  tags:
+  - bedrock
+  - aws
+  - anthropic
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-large
+  healthy: true
+- name: bedrock-nova-micro
+  litellm_model: bedrock/us.amazon.nova-micro-v1:0
+  provider: bedrock
+  tier: simple
+  context_limit: 128000
+  cost_per_1k_input: 1.75e-05
+  cost_per_1k_output: 7.0e-05
+  capabilities:
+  - chat
+  - json-mode
+  tags:
+  - bedrock
+  - aws
+  - amazon
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-small
+  healthy: true
+- name: bedrock-nova-lite
+  litellm_model: bedrock/us.amazon.nova-lite-v1:0
+  provider: bedrock
+  tier: simple
+  context_limit: 300000
+  cost_per_1k_input: 3.0e-05
+  cost_per_1k_output: 0.00012
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  tags:
+  - bedrock
+  - aws
+  - amazon
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-small
+  healthy: true
+- name: bedrock-nova-pro
+  litellm_model: bedrock/us.amazon.nova-pro-v1:0
+  provider: bedrock
+  tier: medium
+  context_limit: 300000
+  cost_per_1k_input: 0.0004
+  cost_per_1k_output: 0.0016
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  - long-context
+  tags:
+  - bedrock
+  - aws
+  - amazon
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-medium
+  healthy: true
+- name: bedrock-llama3-8b
+  litellm_model: bedrock/us.meta.llama3-1-8b-instruct-v1:0
+  provider: bedrock
+  tier: simple
+  context_limit: 128000
+  cost_per_1k_input: 0.0003
+  cost_per_1k_output: 0.0006
+  capabilities:
+  - chat
+  - function-calling
+  tags:
+  - bedrock
+  - aws
+  - meta
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-small
+  healthy: true
+- name: bedrock-llama3-70b
+  litellm_model: bedrock/us.meta.llama3-3-70b-instruct-v1:0
+  provider: bedrock
+  tier: complex
+  context_limit: 128000
+  cost_per_1k_input: 0.00036
+  cost_per_1k_output: 0.00036
+  capabilities:
+  - chat
+  - function-calling
+  - reasoning
+  - math
+  tags:
+  - bedrock
+  - aws
+  - meta
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-large
+  healthy: true
+- name: bedrock-deepseek-r1
+  litellm_model: bedrock/us.deepseek.r1-v1:0
+  provider: bedrock
+  tier: reasoning
+  context_limit: 64000
+  cost_per_1k_input: 0.00135
+  cost_per_1k_output: 0.0054
+  capabilities:
+  - chat
+  - reasoning
+  - math
+  - code
+  tags:
+  - bedrock
+  - aws
+  - deepseek
+  max_parallel_requests: 50
+  fallback_to:
+  - watsonx-granite-large
+  healthy: true
+- name: local-qwen-27b-simple
+  litellm_model: openai/qwen3.8-27b
+  provider: local
+  tier: simple
+  context_limit: 32768
+  cost_per_1k_input: 0.0
+  cost_per_1k_output: 0.0
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  - code
+  - math
+  tags:
+  - local
+  - vllm
+  - qwen
+  - sovereign
+  max_parallel_requests: 20
+  fallback_to:
+  - watsonx-granite-small
+  healthy: true
+  api_base: http://localhost:8000/v1
+  api_key_env: LOCAL_VLLM_API_KEY
+  provider_trust: on_prem
+  cache_capability: prefix_caching
+- name: local-qwen-27b-medium
+  litellm_model: openai/qwen3.8-27b
+  provider: local
+  tier: medium
+  context_limit: 32768
+  cost_per_1k_input: 0.0
+  cost_per_1k_output: 0.0
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  - code
+  - math
+  - reasoning
+  tags:
+  - local
+  - vllm
+  - qwen
+  - sovereign
+  max_parallel_requests: 20
+  fallback_to:
+  - watsonx-granite-medium
+  healthy: true
+  api_base: http://localhost:8000/v1
+  api_key_env: LOCAL_VLLM_API_KEY
+  provider_trust: on_prem
+  cache_capability: prefix_caching
+- name: local-qwen-27b
+  litellm_model: openai/qwen3.8-27b
+  provider: local
+  tier: complex
+  context_limit: 32768
+  cost_per_1k_input: 0.0
+  cost_per_1k_output: 0.0
+  capabilities:
+  - chat
+  - function-calling
+  - json-mode
+  - code
+  - math
+  - reasoning
+  - long-context
+  tags:
+  - local
+  - vllm
+  - qwen
+  - sovereign
+  max_parallel_requests: 10
+  fallback_to:
+  - watsonx-granite-large
+  healthy: true
+  api_base: http://localhost:8000/v1
+  api_key_env: LOCAL_VLLM_API_KEY
+  provider_trust: on_prem
+  cache_capability: prefix_caching

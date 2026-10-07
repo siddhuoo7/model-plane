@@ -41,6 +41,26 @@ dev = [
     "mypy>=1.10.0",
     "httpx>=0.27.0",
 ]
+bert = [
+    # Zero-shot intent classifier via HuggingFace transformers.
+    # Default model: llm-semantic-router/mmbert32k-intent-classifier-merged (149M ModernBERT, CPU <83ms)
+    # Install: pip install 'model-plane[bert]'
+    "transformers>=4.40.0",
+    "torch>=2.2.0",
+]
+laya = [
+    # Local in-process Laya classifier — no API key, no network call.
+    # Answers BOTH task_type (score) AND complexity_tier (choice) in one call.
+    # Install: pip install 'model-plane[laya]'
+    "laya>=0.1.0",
+]
+all-classifiers = [
+    # Install every optional classifier backend in one shot:
+    #   pip install 'model-plane[all-classifiers]'
+    "transformers>=4.40.0",
+    "torch>=2.2.0",
+    "laya>=0.1.0",
+]
 
 [project.scripts]
 model-plane = "model_plane.main:cli"

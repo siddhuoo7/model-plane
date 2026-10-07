@@ -54,6 +54,107 @@ async def chat_completions(
         log.error("routing_pipeline_failed", error=str(exc))
         raise HTTPException(status_code=503, detail="Routing pipeline failed") from exc
 
+    # ── security refusal fast-path ───────────────────────────────────────────
+    if ctx.security_blocked:
+        import time as _time
+        from model_plane.observability.cost_accumulator import get_cost_accumulator
+        from model_plane.observability.request_buffer import get_request_buffer
+
+        refusal_content = ctx.security_refusal_message or (
+            "Request blocked by security policy: sensitivity policy violation."
+        )
+
+        # Record security event in request buffer for the Security & Governance UI
+        try:
+            buf_rec: dict = {
+                "request_id": ctx.request_id,
+                "timestamp": _time.time(),
+                "deployment": "security_guard",
+                "provider": "security_guard",
+                "tier": "security_blocked",
+                "task_type": ctx.classification.task_type.value if ctx.classification else "unknown",
+                "tenant_id": ctx.tenant_id or "",
+                "routing_source": "security_guard",
+                "routing_confidence": 1.0,
+                "input_tokens": ctx.features.total_tokens if ctx.features else 0,
+                "output_tokens": 0,
+                "latency_ms": 0.0,
+                "cost_usd": 0.0,
+                "security_sensitivity": (
+                    ctx.security_ctx.data_sensitivity.value
+                    if ctx.security_ctx else "restricted"
+                ),
+                "security_blocked": (
+                    list(ctx.security_ctx.blocked_deployments.keys())
+                    if ctx.security_ctx else []
+                ),
+                "pii_types": list(ctx.security_ctx.pii_types) if ctx.security_ctx else [],
+                "secret_types": list(ctx.security_ctx.secret_types) if ctx.security_ctx else [],
+                "context_reuse_score": 0.0,
+            }
+            get_request_buffer().push(buf_rec)
+        except Exception as _b_exc:
+            log.warning("security_buffer_push_failed", error=str(_b_exc))
+
+        refusal_payload = {
+            "id": f"chatcmpl-{request_id}",
+            "object": "chat.completion",
+            "created": int(_time.time()),
+            "model": "security-guard",
+            "choices": [
+                {
+                    "index": 0,
+                    "message": {
+                        "role": "assistant",
+                        "content": refusal_content,
+                    },
+                    "finish_reason": "stop",
+                }
+            ],
+            "usage": {
+                "prompt_tokens": ctx.features.total_tokens if ctx.features else 0,
+                "completion_tokens": 0,
+                "total_tokens": ctx.features.total_tokens if ctx.features else 0,
+            },
+        }
+
+        if body.get("stream", False):
+            async def _stream_refusal():
+                chunk = {
+                    "id": f"chatcmpl-{request_id}",
+                    "object": "chat.completion.chunk",
+                    "created": int(_time.time()),
+                    "model": "security-guard",
+                    "choices": [
+                        {
+                            "index": 0,
+                            "delta": {"role": "assistant", "content": refusal_content},
+                            "finish_reason": "stop",
+                        }
+                    ],
+                }
+                yield b"data: " + orjson.dumps(chunk) + b"\n\n"
+                yield b"data: [DONE]\n\n"
+
+            return StreamingResponse(
+                _stream_refusal(),
+                media_type="text/event-stream",
+                headers={"X-Request-Id": request_id, "X-Deployment": "security-guard"},
+            )
+
+        return JSONResponse(
+            content=refusal_payload,
+            headers={
+                "X-Request-Id": request_id,
+                "X-Deployment": "security-guard",
+                "X-Routing-Source": "security_guard",
+                "X-Data-Sensitivity": (
+                    ctx.security_ctx.data_sensitivity.value
+                    if ctx.security_ctx else "restricted"
+                ),
+            },
+        )
+
     # ── cache-aware routing adjustment ───────────────────────────────────────
     if session_id:
         messages = body.get("messages", [])
@@ -159,7 +260,8 @@ async def chat_completions(
     _update_similarity_index(ctx)
 
     resp_dict = response.model_dump() if hasattr(response, "model_dump") else dict(response)
-    return _inject_routing_headers(resp_dict, ctx)
+    include_routing_info = request.headers.get("x-include-routing-info", "").lower() == "true"
+    return _inject_routing_headers(resp_dict, ctx, include_routing_info=include_routing_info)
 
 
 async def _stream_chunks(ctx, request_id: str) -> AsyncIterator[bytes]:
@@ -204,8 +306,13 @@ def _update_similarity_index(ctx: Any) -> None:
         log.debug("similarity_index_update_failed", error=str(exc))
 
 
-def _inject_routing_headers(resp: dict, ctx: Any) -> JSONResponse:
-    """Inject routing metadata + cost into response headers AND body."""
+def _inject_routing_headers(resp: dict, ctx: Any, *, include_routing_info: bool = False) -> JSONResponse:
+    """Inject routing metadata + cost into response headers AND body.
+
+    When ``include_routing_info=True`` (caller sent ``X-Include-Routing-Info: true``),
+    an additional ``X-Routing-Decision`` header is attached with a structured JSON
+    breakdown of deployment, tier, confidence, source, and scorer dimensions.
+    """
     dep = ctx.selected_deployment
     task = ctx.classification.task_type.value if ctx.classification else ""
 
@@ -222,7 +329,7 @@ def _inject_routing_headers(resp: dict, ctx: Any) -> JSONResponse:
             + output_tok / 1000.0 * dep.cost_per_1k_output
         )
 
-    headers = {
+    headers: dict[str, str] = {
         "X-Request-Id": ctx.request_id,
         "X-Deployment": dep.name if dep else "",
         "X-Task-Type": task,
@@ -232,6 +339,21 @@ def _inject_routing_headers(resp: dict, ctx: Any) -> JSONResponse:
         "X-Cache-Warm": str(ctx.cache_warm).lower(),
         "X-Escalated": str(ctx.escalated).lower(),
     }
+
+    # ── optional detailed routing explanation header ───────────────────────
+    if include_routing_info and ctx.scorer_result and ctx.classification:
+        import json as _json
+        explanation = {
+            "deployment": dep.name if dep else None,
+            "tier": ctx.scorer_result.tier.value,
+            "confidence": round(ctx.routing_confidence, 4),
+            "source": ctx.routing_source,
+            "scorer_breakdown": {
+                k: round(v, 4)
+                for k, v in ctx.scorer_result.dimension_scores.items()
+            },
+        }
+        headers["X-Routing-Decision"] = _json.dumps(explanation, separators=(",", ":"))
 
     # Also embed routing metadata inside the response body under "x_model_plane"
     resp["x_model_plane"] = {

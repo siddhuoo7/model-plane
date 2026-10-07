@@ -25,7 +25,9 @@ from model_plane.compression.processor import compress
 from model_plane.config import settings
 from model_plane.logging_setup import get_logger
 from model_plane.ml.recommender import get_recorder
+from model_plane.observability.cost_accumulator import get_cost_accumulator
 from model_plane.observability.metrics import record_request
+from model_plane.observability.request_buffer import get_request_buffer
 from model_plane.routing.context import RoutingContext
 
 log = get_logger(__name__)
@@ -96,7 +98,11 @@ class PostCallHook(litellm.CustomLogger):  # type: ignore[misc]
     """
 
     def log_success_event(self, kwargs: dict, response_obj: Any, start_time: Any, end_time: Any) -> None:
-        ctx: RoutingContext | None = kwargs.get("__routing_ctx")
+        ctx: RoutingContext | None = (
+            kwargs.get("__routing_ctx")
+            or kwargs.get("litellm_params", {}).get("metadata", {}).get("__routing_ctx")
+            or kwargs.get("metadata", {}).get("__routing_ctx")
+        )
         if ctx is None:
             return
 
@@ -139,6 +145,58 @@ class PostCallHook(litellm.CustomLogger):  # type: ignore[misc]
         # Metrics
         record_request(ctx, success=True)
 
+        # ── Admin buffer + cost accumulator (Sub-Task 3.1) ────────────────────
+        try:
+            dep = ctx.selected_deployment
+            task_type_val = (
+                ctx.classification.task_type.value
+                if ctx.classification else "unknown"
+            )
+            tier_val = dep.tier if dep else "unknown"
+            provider_val = dep.provider if dep else "unknown"
+            tenant_val = ctx.tenant_id or ""
+
+            record: dict = {
+                "request_id": ctx.request_id,
+                "timestamp": __import__("time").time(),
+                "deployment": dep.name if dep else None,
+                "provider": provider_val,
+                "tier": tier_val,
+                "task_type": task_type_val,
+                "tenant_id": tenant_val,
+                "routing_source": ctx.routing_source,
+                "routing_confidence": round(ctx.routing_confidence or 0.0, 4),
+                "input_tokens": ctx.input_tokens,
+                "output_tokens": ctx.output_tokens,
+                "latency_ms": round(ctx.latency_ms, 1),
+                "cost_usd": round(ctx.cost_usd, 8),
+                "ml_recommended": ctx.ml_recommended_deployment,
+                "ml_confidence": round(ctx.ml_recommendation_confidence or 0.0, 4),
+                "security_sensitivity": (
+                    ctx.security_ctx.data_sensitivity.value
+                    if ctx.security_ctx else "disabled"
+                ),
+                "security_blocked": (
+                    list(ctx.security_ctx.blocked_deployments.keys())
+                    if ctx.security_ctx else []
+                ),
+                "pii_types": list(ctx.security_ctx.pii_types) if ctx.security_ctx else [],
+                "secret_types": list(ctx.security_ctx.secret_types) if ctx.security_ctx else [],
+                "context_reuse_score": round(ctx.context_reuse_score, 3),
+            }
+            get_request_buffer().push(record)
+            get_cost_accumulator().record(
+                provider=provider_val,
+                tier=tier_val,
+                task_type=task_type_val,
+                tenant_id=tenant_val,
+                cost_usd=ctx.cost_usd,
+                input_tokens=ctx.input_tokens,
+                output_tokens=ctx.output_tokens,
+            )
+        except Exception as exc:
+            log.warning("admin_buffer_push_failed", error=str(exc))
+
         log.info(
             "request_complete",
             request_id=ctx.request_id,
@@ -150,7 +208,11 @@ class PostCallHook(litellm.CustomLogger):  # type: ignore[misc]
         )
 
     def log_failure_event(self, kwargs: dict, response_obj: Any, start_time: Any, end_time: Any) -> None:
-        ctx: RoutingContext | None = kwargs.get("__routing_ctx")
+        ctx: RoutingContext | None = (
+            kwargs.get("__routing_ctx")
+            or kwargs.get("litellm_params", {}).get("metadata", {}).get("__routing_ctx")
+            or kwargs.get("metadata", {}).get("__routing_ctx")
+        )
         if ctx is None:
             return
         try:
@@ -162,11 +224,14 @@ class PostCallHook(litellm.CustomLogger):  # type: ignore[misc]
         except Exception:
             ctx.latency_ms = 0.0
         record_request(ctx, success=False)
+        # LiteLLM passes the exception in kwargs["exception"]; response_obj is None
+        # on failure events.
+        exc = kwargs.get("exception") or response_obj
         log.error(
             "request_failed",
             request_id=ctx.request_id,
             latency_ms=round(ctx.latency_ms, 1),
-            error=str(response_obj),
+            error=str(exc) if exc is not None else "unknown",
         )
 
     async def async_log_success_event(

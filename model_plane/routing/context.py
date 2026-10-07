@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from model_plane.classifier.classifier import ClassificationResult
 from model_plane.classifier.features import RequestFeatures
 from model_plane.registry.catalog import DeploymentConfig
 from model_plane.scorer.scorer import ScorerResult
+
+if TYPE_CHECKING:
+    from model_plane.classifier.taxonomy import ComplexityTier
+    from model_plane.routing.security import SecurityContext
 
 
 @dataclass
@@ -41,6 +45,20 @@ class RoutingContext:
     # cache
     cache_warm: bool = False
     prefix_hash: str | None = None
+    # Cache-aware routing (L1/L3): how session or content-hash affinity was applied.
+    # "none"           — no cache routing triggered
+    # "session_affinity" — L1: routed to warm session deployment
+    # "content_hash"   — L3: routed to deployment holding that document prefix
+    affinity_source: str = "none"
+
+    # security (filled by Stage 0.5 SecurityGuard)
+    security_ctx: "SecurityContext | None" = None
+    security_blocked: bool = False
+    security_refusal_message: str | None = None
+
+    # context reuse (filled by Stage 6e)
+    context_reuse_score: float = 0.0
+    turn_index: int = 0
 
     # response metrics (filled post-call)
     latency_ms: float = 0.0
@@ -52,14 +70,18 @@ class RoutingContext:
     escalated: bool = False
     final_success: bool | None = None
 
-    # ML shadow
+    # ML shadow / tier resolver
     ml_recommended_deployment: str | None = None
     ml_recommendation_confidence: float = 0.0
+    ml_resolved_tier: "ComplexityTier | None" = None  # set by Stage 3.6 tier mode
 
 
 @dataclass
 class RoutingDecision:
-    deployment: DeploymentConfig
+    deployment: DeploymentConfig | None
     source: str  # custom_plugin | litellm_auto_router | default | fallback
     confidence: float
     reasoning: str = ""
+    # ML tier fields (set in Stage 3.6 tier mode)
+    ml_tier: "ComplexityTier | None" = None        # tier predicted by the ML model
+    resolved_tier: "ComplexityTier | None" = None  # tier actually used to select the deployment

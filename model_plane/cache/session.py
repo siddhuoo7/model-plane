@@ -32,6 +32,9 @@ class SessionState:
     cache_expiry: float = 0.0
     last_compaction: float = 0.0
     model_switches: int = 0
+    # Sub-Task 4.1: switch-cost economics fields
+    warm_model_ids: set = field(default_factory=set)    # deployments that have been warm
+    accumulated_tokens: int = 0                          # total tokens seen on current warm model
 
     def is_expired(self) -> bool:
         if self.cache_expiry and time.time() > self.cache_expiry:
@@ -170,6 +173,12 @@ class CacheAwareRouter:
             existing.provider = provider
             if model_switched:
                 existing.model_switches += 1
+                # Reset accumulated tokens on switch; warm_model_ids keeps history
+                existing.accumulated_tokens = context_tokens
+            else:
+                # Accumulate tokens on the warm model
+                existing.accumulated_tokens += context_tokens
+            existing.warm_model_ids.add(deployment_name)
             self._cache.put(existing)
         else:
             state = SessionState(
@@ -179,6 +188,8 @@ class CacheAwareRouter:
                 prefix_hash=prefix_hash,
                 context_tokens=context_tokens,
                 cache_expiry=time.time() + settings.cache_ttl_seconds,
+                warm_model_ids={deployment_name},
+                accumulated_tokens=context_tokens,
             )
             self._cache.put(state)
 

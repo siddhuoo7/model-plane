@@ -17,16 +17,18 @@ from model_plane.routing.context import RoutingContext
 def _make_ctx(dep_name: str = "wx-primary") -> RoutingContext:
     ctx = RoutingContext(request_id="test-shadow", raw_request={})
     dep = DeploymentConfig(
-        name=dep_name, litellm_model="watsonx/x", provider="watsonx", tier="medium"
+        name=dep_name, litellm_model="local/x", provider="local", tier="medium"
     )
     ctx.selected_deployment = dep
     return ctx
 
 
-def _make_catalog(*names: str) -> ModelCatalog:
+def _make_catalog(*names: str, provider: str = "local") -> ModelCatalog:
+    """Build a test catalog.  Defaults to provider='local' so all_healthy() passes
+    without needing real credentials (local is always credentialed)."""
     catalog = ModelCatalog()
     for n in names:
-        dep = DeploymentConfig(name=n, litellm_model="x", provider="watsonx", tier="medium")
+        dep = DeploymentConfig(name=n, litellm_model="x", provider=provider, tier="medium")
         catalog.deployments[n] = dep
         catalog.tier_map.setdefault("medium", []).append(n)
     return catalog
