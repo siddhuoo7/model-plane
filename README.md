@@ -37,6 +37,30 @@ Agent / Client (OpenAI or Anthropic SDK)
 
 ---
 
+## 🖥️ Operator Dashboard
+
+Model Plane includes an interactive **Carbon Design System Admin UI** (`http://localhost:8081/admin/`) for real-time observability, dynamic routing rules, and provider management.
+
+<p align="center">
+  <img src="docs/brand/assets/dashboard.png" alt="Model Plane Dashboard" width="100%" />
+</p>
+
+<details>
+<summary><b>🔍 View more UI screenshots (Request Explorer, Cost Analytics, Providers, Security)</b></summary>
+<br/>
+
+| Request Explorer & Traces | Cost Analytics |
+|:---:|:---:|
+| <img src="docs/brand/assets/request-explorer.png" width="100%" /> | <img src="docs/brand/assets/cost-analytics.png" width="100%" /> |
+
+| Provider Management | Security & Governance Matrix |
+|:---:|:---:|
+| <img src="docs/brand/assets/provider-management.png" width="100%" /> | <img src="docs/brand/assets/security-governance.png" width="100%" /> |
+
+</details>
+
+---
+
 ## ⚡ Quick Start
 
 ### 1. Install & Run
@@ -63,6 +87,7 @@ You can set up credentials easily through the **Admin UI** or via `.env`:
 
 1. **Via UI (Recommended)**: Open `http://localhost:5173/admin/settings` or `/admin/providers` and enter your provider API keys directly with real-time connectivity testing.
 2. **Via `.env`**:
+
    ```bash
    cp .env.example .env
    # Add your key for OpenAI, Anthropic, watsonx, Bedrock, etc.
@@ -125,7 +150,7 @@ print(response.content[0].text)
 ## 🛠️ CLI & Scripts
 
 | Command | Description |
-|---|---|
+| --- | --- |
 | `pnpm start` | Run API backend and Admin UI dev server concurrently |
 | `pnpm run api` | Start FastAPI backend only (`:8081`) |
 | `pnpm run ui` | Start Vite UI dev server only (`:5173`) |
