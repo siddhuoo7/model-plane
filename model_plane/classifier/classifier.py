@@ -53,7 +53,8 @@ _CODE_GEN = re.compile(
     # "write a Python async web scraper", "write a REST API"
     r"\b(write\s+(?:\w+\s+){0,4}(function|class|method|script|program|module|api|"
     r"endpoint|decorator|generator|iterator|parser|cli|server|client|scraper|crawler|"
-    r"bot|hook|plugin|library|sdk|util|utility|tool|pipeline|agent|worker)|"
+    r"bot|hook|plugin|library|sdk|util|utility|tool|pipeline|agent|worker|sort|"
+    r"algorithm|solution|snippet|example|template)|"
     r"implement\s+(?:a\s+|an\s+|the\s+)?\w+|"
     r"create\s+(?:\w+\s+){0,4}(function|class|method|script|program|module)|"
     r"build\s+(?:\w+\s+){0,4}(function|class|api|service|module)|"
@@ -95,6 +96,7 @@ _TECH_REASON = re.compile(
     # "key differences", "the difference", "what's the difference"
     r"\bkey differences?\b|\bwhat.s the differences?\b|\bthe differences? between\b|"
     r"how does .{0,30} work|"
+    r"\bexplain\s+how\b|"
     r"\bexplain (the )?(architecture|design|algorithm|protocol|mechanism|trade.offs?)\b|"
     # "Design a microservices architecture", "design the system", "design an API for ..."
     r"\bdesign\s+(?:a\s+|an\s+|the\s+)?(?:\w+\s+){0,3}"
@@ -237,8 +239,10 @@ async def _classify_async_impl(features: RequestFeatures, owner_id: str = "") ->
     adapter = get_classifier(owner_id=owner_id)
     if adapter is not None:
         try:
+            from model_plane.config import settings as _settings
+            _min_conf = _settings.classifier_min_confidence  # default 0.60
             adapter_result = await adapter.classify(features)
-            if adapter_result is not None:
+            if adapter_result is not None and adapter_result.confidence >= _min_conf:
                 # mBERT: overrides task_type only (tier already re-derived inside adapter)
                 # Laya:  overrides BOTH task_type AND complexity_tier
                 task = adapter_result.task_type
@@ -246,6 +250,12 @@ async def _classify_async_impl(features: RequestFeatures, owner_id: str = "") ->
                 tier = adapter_result.complexity_tier
                 # Merge adapter signals on top of regex signals
                 signals.update(adapter_result.signals)
+            elif adapter_result is not None:
+                # Adapter ran but confidence too low — keep regex result, log adapter signals
+                signals.update({
+                    k: v for k, v in adapter_result.signals.items()
+                    if k.startswith("_")  # preserve _source metadata
+                })
         except Exception:
             # Never let adapter errors break routing — regex result stands
             pass

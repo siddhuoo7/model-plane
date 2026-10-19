@@ -496,7 +496,11 @@ def run_routing_pipeline(ctx: RoutingContext) -> RoutingDecision:
                   candidates=[d.name for d in tier_candidates])
 
     # ── 6b. Task override check ──────────────────────────────────────────────
-    if override_names:
+    # Only apply deployment overrides when the classifier is confident enough.
+    # A low-confidence classification (e.g. mbert guessing long_context_synthesis
+    # at 0.47) must not bypass tier filtering — the tier signal is more reliable.
+    _override_conf_ok = _clf_confident  # reuse the same blend_min_confidence threshold
+    if override_names and _override_conf_ok:
         from model_plane.provider_creds import provider_has_creds as _phc
         override_candidates = [
             catalog.get(n) for n in override_names
@@ -510,6 +514,14 @@ def run_routing_pipeline(ctx: RoutingContext) -> RoutingDecision:
                 override_deployments=[d.name for d in override_candidates],
             )
             tier_candidates = override_candidates
+    elif override_names and not _override_conf_ok:
+        log.debug(
+            "step6b_task_override_skipped_low_conf",
+            request_id=ctx.request_id,
+            task=ctx.classification.task_type.value,
+            classifier_conf=round(ctx.classification.confidence, 3),
+            threshold=_blend_min_conf,
+        )
 
     # ── 6b2. Content-hash routing — Level 3 cache-aware routing ─────────────
     # For RAG / document workloads: if context.prefix_hash is set and another

@@ -80,7 +80,7 @@ TASK_DEFAULT_TIER: dict[TaskType, ComplexityTier] = {
     TaskType.CODE_DEBUGGING: ComplexityTier.COMPLEX,
     TaskType.REPOSITORY_SEARCH: ComplexityTier.MEDIUM,
     TaskType.TOOL_CALL_INTERPRETATION: ComplexityTier.MEDIUM,
-    TaskType.TECHNICAL_REASONING: ComplexityTier.REASONING,
+    TaskType.TECHNICAL_REASONING: ComplexityTier.COMPLEX,
     TaskType.MATHEMATICAL_REASONING: ComplexityTier.REASONING,
     TaskType.LONG_CONTEXT_SYNTHESIS: ComplexityTier.COMPLEX,
     TaskType.UNKNOWN: ComplexityTier.MEDIUM,

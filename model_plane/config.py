@@ -116,7 +116,7 @@ class Settings(BaseSettings):
     # CLASSIFIER_MODEL=mbert   → regex + BERT NLI (overrides task_type, re-derives tier)
     # CLASSIFIER_MODEL=laya    → regex + Laya (overrides task_type AND complexity_tier)
     classifier_model: str = "regex"
-    classifier_min_confidence: float = 0.60  # below this, regex result is kept
+    classifier_min_confidence: float = 0.75  # below this, regex result is kept
     # Task classifier — primary joblib (sklearn GBT/RF), backup JSON (logistic regression)
     ml_task_classifier_path: str = "models/classifier_task.joblib"
     ml_task_classifier_json_path: str = "models/classifier_ml.json"

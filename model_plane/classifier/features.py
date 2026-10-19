@@ -135,7 +135,9 @@ _RE_SIMPLE = re.compile(
     r"\b(what is|what are|who is|who was|when did|when was|where is|where was|"
     r"define |how many|how much|yes or no|true or false|spell out|"
     r"what does .{0,20} stand for|what does .{0,20} mean|"
-    r"hi |hello|hey |good morning|good afternoon|how are you|nice to meet)\b",
+    r"hi\b|hello\b|hey\b|howdy\b|greetings\b|"
+    r"good morning|good afternoon|good evening|how are you|nice to meet|"
+    r"thanks\b|thank you|ok\b|okay\b|bye\b|goodbye\b|sure\b|yep\b|nope\b)\b",
     re.I,
 )
 _RE_MULTI_STEP = re.compile(
