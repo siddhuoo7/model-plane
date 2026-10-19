@@ -336,16 +336,54 @@ class TrainingDataRecorder:
                 ])
 
     def record(self, ctx: "Any") -> None:  # RoutingContext circular import guard
+        """Auto-append a row on every request.
+
+        Disabled by default (``training_auto_record=False``).  Only runs when
+        the flag is explicitly enabled — use the feedback API instead.
+        """
+        if not settings.training_auto_record:
+            return
+        self._write_row_from_ctx(ctx, feedback_source="auto", quality_score=None)
+
+    def record_feedback(
+        self,
+        ctx: "Any",
+        corrected_tier: str | None,
+        quality_score: float,
+    ) -> None:
+        """Write a single training row that was explicitly approved by a human.
+
+        Args:
+            ctx:            The RoutingContext for the request.
+            corrected_tier: Human-supplied tier override, or None to keep the
+                            pipeline's original tier.
+            quality_score:  Human quality signal (1.0 = thumbs up, 0.0 = thumbs down).
+        """
+        self._write_row_from_ctx(
+            ctx,
+            feedback_source="human_feedback",
+            quality_score=quality_score,
+            tier_override=corrected_tier,
+        )
+
+    def _write_row_from_ctx(
+        self,
+        ctx: "Any",
+        feedback_source: str,
+        quality_score: float | None,
+        tier_override: str | None = None,
+    ) -> None:
         try:
             f = ctx.features
             c = ctx.classification
             if not f or not c:
                 return
+            tier = tier_override or (ctx.scorer_result.tier.value if ctx.scorer_result else "")
             row = [
                 datetime.now(tz=timezone.utc).isoformat(),
                 ctx.request_id,
                 c.task_type.value,
-                ctx.scorer_result.tier.value if ctx.scorer_result else "",
+                tier,
                 *f.as_vector(task_type=c.task_type),
                 ctx.selected_deployment.name if ctx.selected_deployment else "",
                 ctx.latency_ms,
@@ -353,12 +391,36 @@ class TrainingDataRecorder:
                 ctx.validation_result or "",
                 ctx.fallback_used,
                 ctx.final_success if ctx.final_success is not None else "",
+                feedback_source,
+                quality_score if quality_score is not None else "",
             ]
             with self._lock:
+                # Ensure header has feedback_source + quality_score columns
+                if self._path.exists():
+                    with open(self._path, "r", newline="") as fh:
+                        header = next(csv.reader(fh), [])
+                    if "feedback_source" not in header:
+                        self._append_columns(["feedback_source", "quality_score"])
                 with open(self._path, "a", newline="") as fh:
                     csv.writer(fh).writerow(row)
         except Exception as exc:
             log.warning("training_record_failed", error=str(exc))
+
+    def _append_columns(self, new_cols: list[str]) -> None:
+        """Add new column headers + blank values to every existing row."""
+        try:
+            with open(self._path, "r", newline="") as fh:
+                reader = csv.reader(fh)
+                rows = list(reader)
+            if not rows:
+                return
+            rows[0].extend(new_cols)
+            for row in rows[1:]:
+                row.extend([""] * len(new_cols))
+            with open(self._path, "w", newline="") as fh:
+                csv.writer(fh).writerows(rows)
+        except Exception as exc:
+            log.warning("training_append_columns_failed", error=str(exc))
 
 
 # ── singletons ────────────────────────────────────────────────────────────────

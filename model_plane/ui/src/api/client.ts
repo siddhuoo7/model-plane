@@ -534,6 +534,24 @@ export const api = {
       apiFetch<void>(`/settings/api-keys/${id}`, { method: 'DELETE' }, true),
   },
 
+  feedback: {
+    submit: (
+      requestId: string,
+      approved: boolean,
+      correctedTier?: string,
+    ) =>
+      apiFetch<{
+        request_id: string
+        approved: boolean
+        tier_recorded: string
+        quality_score: number
+        written_to: string
+      }>(`/requests/${requestId}/feedback`, {
+        method: 'POST',
+        body: JSON.stringify({ approved, corrected_tier: correctedTier }),
+      }),
+  },
+
   security: {
     summary: () => apiFetch<SecuritySummaryResponse>('/security/summary'),
     flags:   () => apiFetch<SecurityFlagsResponse>('/security/flags'),

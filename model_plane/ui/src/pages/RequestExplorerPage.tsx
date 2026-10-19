@@ -4,7 +4,7 @@
  * simulator panel: classifier, scorer, blend, cache, security, compression,
  * plus a raw-JSON view of the entire record.
  */
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import {
   DataTable,
   TableContainer,
@@ -22,8 +22,9 @@ import {
   SelectItem,
   Button,
   Pagination,
+  InlineNotification,
 } from '@carbon/react'
-import { Search, Reset, Time } from '@carbon/icons-react'
+import { Search, Reset, Time, ThumbsUp, ThumbsDown } from '@carbon/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { api, RequestRecord } from '../api/client'
 import { TierBadge } from '../components/TierBadge'
@@ -390,11 +391,134 @@ function JsonTab({ rec }: { rec: RequestRecord }) {
   )
 }
 
+// ── Feedback bar ─────────────────────────────────────────────────────────────
+
+const TIERS = ['simple', 'medium', 'complex', 'reasoning'] as const
+
+function FeedbackBar({ rec }: { rec: RequestRecord }) {
+  const [vote, setVote]               = useState<'up' | 'down' | null>(null)
+  const [correctedTier, setCorrected] = useState('')
+  const [status, setStatus]           = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [errorMsg, setErrorMsg]       = useState('')
+
+  const submit = useCallback(async () => {
+    if (vote === null) return
+    setStatus('saving')
+    try {
+      await api.feedback.submit(
+        rec.id,
+        vote === 'up',
+        correctedTier || undefined,
+      )
+      setStatus('saved')
+    } catch (e: any) {
+      setErrorMsg(e?.message ?? 'Failed to save feedback')
+      setStatus('error')
+    }
+  }, [vote, correctedTier, rec.id])
+
+  if (status === 'saved') {
+    return (
+      <div style={{ marginBottom: '0.75rem' }}>
+        <InlineNotification
+          kind="success"
+          title="Feedback saved"
+          subtitle="This routing decision has been added to the training dataset."
+          hideCloseButton
+          lowContrast
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap',
+      marginBottom: '0.875rem', padding: '0.625rem 0.75rem',
+      background: '#f4f4f4', borderRadius: 6, border: '1px solid #e0e0e0',
+    }}>
+      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#525252', whiteSpace: 'nowrap' }}>
+        Was this routing correct?
+      </span>
+
+      {/* Thumbs up */}
+      <button
+        onClick={() => setVote('up')}
+        title="Routing was correct"
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: 4,
+          padding: '4px 12px', borderRadius: 20, cursor: 'pointer',
+          fontSize: '0.75rem', fontWeight: 600,
+          border: vote === 'up' ? '2px solid #24a148' : '1px solid #c6c6c6',
+          background: vote === 'up' ? '#defbe6' : '#fff',
+          color: vote === 'up' ? '#198038' : '#525252',
+        }}
+      >
+        <ThumbsUp size={14} /> Yes
+      </button>
+
+      {/* Thumbs down */}
+      <button
+        onClick={() => setVote('down')}
+        title="Routing was wrong"
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: 4,
+          padding: '4px 12px', borderRadius: 20, cursor: 'pointer',
+          fontSize: '0.75rem', fontWeight: 600,
+          border: vote === 'down' ? '2px solid #da1e28' : '1px solid #c6c6c6',
+          background: vote === 'down' ? '#fff1f1' : '#fff',
+          color: vote === 'down' ? '#da1e28' : '#525252',
+        }}
+      >
+        <ThumbsDown size={14} /> No
+      </button>
+
+      {/* Tier correction — only shown after thumbs-down */}
+      {vote === 'down' && (
+        <select
+          value={correctedTier}
+          onChange={e => setCorrected(e.target.value)}
+          style={{
+            padding: '4px 8px', borderRadius: 4, border: '1px solid #c6c6c6',
+            fontSize: '0.75rem', background: '#fff', cursor: 'pointer',
+          }}
+        >
+          <option value="">Should have been… (optional)</option>
+          {TIERS.map(t => (
+            <option key={t} value={t}>{t}</option>
+          ))}
+        </select>
+      )}
+
+      {/* Submit */}
+      {vote !== null && (
+        <button
+          onClick={submit}
+          disabled={status === 'saving'}
+          style={{
+            padding: '4px 14px', borderRadius: 4, cursor: status === 'saving' ? 'not-allowed' : 'pointer',
+            fontSize: '0.75rem', fontWeight: 600,
+            background: '#0f62fe', color: '#fff', border: 'none',
+            opacity: status === 'saving' ? 0.6 : 1,
+          }}
+        >
+          {status === 'saving' ? 'Saving…' : 'Submit feedback'}
+        </button>
+      )}
+
+      {status === 'error' && (
+        <span style={{ fontSize: '0.7rem', color: '#da1e28' }}>⚠ {errorMsg}</span>
+      )}
+    </div>
+  )
+}
+
 // Full expanded drawer
 function RequestDrawer({ rec }: { rec: RequestRecord }) {
   const [tab, setTab] = useState<DrawerTab>('pipeline')
   return (
     <div style={{ padding: '0.75rem 1rem 1rem', background: '#fafafa', borderTop: '1px solid #e0e0e0' }}>
+      <FeedbackBar rec={rec} />
       <DrawerTabBar active={tab} onChange={setTab} />
       <div style={{ maxWidth: 900 }}>
         {tab === 'pipeline'    && <PipelineTab    rec={rec} />}

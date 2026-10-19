@@ -134,6 +134,12 @@ class Settings(BaseSettings):
     similarity_min_hits: int = 3
     similarity_top_k: int = 5
 
+    # ── training data ────────────────────────────────────────────────────────
+    # When False (default) the TrainingDataRecorder never auto-appends rows on
+    # every request.  Training data is only written when a human explicitly
+    # approves a request via the feedback API.
+    training_auto_record: bool = False
+
     # ── compression ───────────────────────────────────────────────────────────
     compression_enabled: bool = True
     compression_token_threshold: int = 6000  # tokens before compression kicks in

@@ -1497,6 +1497,122 @@ async def ml_training_data(
     }
 
 
+@router.post("/requests/{request_id}/feedback")
+async def submit_request_feedback(
+    request_id: str = Path(..., description="Request ID from the request explorer"),
+    body: dict[str, Any] = Body(...),
+    _auth: AdminAuth = None,
+) -> dict[str, Any]:
+    """Record human feedback for a request and append it to the training dataset.
+
+    Body fields:
+      - ``approved`` (bool, required): true = routing was correct (thumbs up);
+        false = routing was wrong (thumbs down).
+      - ``corrected_tier`` (str, optional): one of ``simple``, ``medium``,
+        ``complex``, ``reasoning``.  If omitted, the pipeline's original tier
+        is used.  Only meaningful when ``approved=False``.
+
+    The endpoint looks the request up in the ring buffer, reconstructs feature
+    columns from the stored ``score_breakdown``, and appends a single row to
+    ``training_data.csv`` with ``feedback_source=human_feedback``.
+    """
+    from model_plane.ml.recommender import get_recorder
+    import pathlib, csv as _csv, datetime as _dt
+
+    approved: bool = bool(body.get("approved", True))
+    corrected_tier: str | None = body.get("corrected_tier") or None
+
+    # Valid tiers
+    _VALID_TIERS = {"simple", "medium", "complex", "reasoning"}
+    if corrected_tier and corrected_tier not in _VALID_TIERS:
+        raise HTTPException(status_code=422, detail=f"corrected_tier must be one of {sorted(_VALID_TIERS)}")
+
+    # Find the request in the ring buffer
+    buf = get_request_buffer()
+    record: dict[str, Any] | None = None
+    for rec in buf.snapshot(limit=settings.admin_buffer_size):
+        if rec.get("request_id") == request_id:
+            record = rec
+            break
+
+    if record is None:
+        raise HTTPException(status_code=404, detail=f"Request '{request_id}' not found in buffer")
+
+    # Determine tier to use for training
+    tier_to_record = corrected_tier or record.get("tier") or record.get("scorer_tier") or ""
+
+    quality_score = 1.0 if approved else 0.0
+
+    # Build the training row from buffer fields
+    # score_breakdown keys match training CSV feature column names
+    # (scorer uses token_count; CSV uses token_count_signal — map both)
+    score_breakdown: dict[str, float] = record.get("score_breakdown") or {}
+    _COL_ORDER = [
+        "reasoning_markers", "code_presence", "simple_indicators",
+        "multi_step_patterns", "technical_terms", "token_count_signal",
+        "creative_markers", "question_complexity", "constraint_count",
+        "imperative_verbs", "output_format", "domain_specificity",
+        "reference_complexity", "negation_complexity",
+    ]
+    feature_vals = {
+        col: score_breakdown.get(col, score_breakdown.get("token_count", 0.0))
+        if col == "token_count_signal"
+        else score_breakdown.get(col, 0.0)
+        for col in _COL_ORDER
+    }
+
+    data_path = pathlib.Path("model_plane/data/training_data.csv")
+    fieldnames = [
+        "timestamp", "query", "task_type", "tier",
+        "reasoning_markers", "code_presence", "simple_indicators",
+        "multi_step_patterns", "technical_terms", "token_count_signal",
+        "creative_markers", "question_complexity", "constraint_count",
+        "imperative_verbs", "output_format", "domain_specificity",
+        "reference_complexity", "negation_complexity",
+        "selected_deployment", "latency_ms", "cost_usd",
+        "validation_result", "fallback_used", "final_success",
+        "feedback_source", "quality_score",
+    ]
+
+    row = {
+        "timestamp": _dt.datetime.now(tz=_dt.timezone.utc).isoformat(),
+        "query": request_id,   # store ID not raw query text (PII-safe)
+        "task_type": record.get("task_type", ""),
+        "tier": tier_to_record,
+        **feature_vals,
+        "selected_deployment": record.get("deployment", ""),
+        "latency_ms": record.get("latency_ms", ""),
+        "cost_usd": record.get("cost_usd", ""),
+        "validation_result": "",
+        "fallback_used": "",
+        "final_success": 1 if approved else 0,
+        "feedback_source": "human_feedback",
+        "quality_score": quality_score,
+    }
+
+    write_header = not data_path.exists()
+    with open(data_path, "a", newline="") as fh:
+        writer = _csv.DictWriter(fh, fieldnames=fieldnames, extrasaction="ignore")
+        if write_header:
+            writer.writeheader()
+        writer.writerow(row)
+
+    log.info(
+        "feedback_recorded",
+        request_id=request_id,
+        approved=approved,
+        corrected_tier=corrected_tier,
+        tier_used=tier_to_record,
+    )
+    return {
+        "request_id": request_id,
+        "approved": approved,
+        "tier_recorded": tier_to_record,
+        "quality_score": quality_score,
+        "written_to": str(data_path),
+    }
+
+
 @router.post("/ml/training-data/upload")
 async def ml_upload_training_data(
     file: UploadFile,
