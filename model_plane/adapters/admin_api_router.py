@@ -1186,10 +1186,11 @@ def _load_tier_model_info(path: "pathlib.Path") -> dict[str, Any]:
             if hasattr(model, "n_features_in_"):
                 info["feature_count"] = int(model.n_features_in_)
             if hasattr(model, "feature_importances_"):
-                from model_plane.ml.trainer import FEATURE_COLUMNS
+                from model_plane.ml.trainer import FEATURE_COLUMNS, QUERY_SIGNAL_COLUMNS
+                all_names = FEATURE_COLUMNS + QUERY_SIGNAL_COLUMNS
                 imps = model.feature_importances_.tolist()
                 info["feature_importances"] = {
-                    FEATURE_COLUMNS[i] if i < len(FEATURE_COLUMNS) else f"dim_{i}": round(v, 5)
+                    all_names[i] if i < len(all_names) else f"dim_{i}": round(v, 5)
                     for i, v in enumerate(imps)
                 }
     except Exception as exc:
