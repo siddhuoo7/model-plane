@@ -35,12 +35,14 @@ class RoutingContext:
     selected_deployment: DeploymentConfig | None = None
     routing_source: str = "unset"  # custom_plugin | litellm_auto_router | default
     routing_confidence: float = 0.0
+    routing_reason: str | None = None  # human-readable explanation of the final routing choice
 
     # compression
     compression_profile: str = "passthrough"
     compressed_request: dict[str, Any] | None = None
     tokens_before_compression: int = 0
     tokens_after_compression: int = 0
+    volatile_tokens_found: int = 0  # CacheAligner: volatile tokens in system prompt
 
     # cache
     cache_warm: bool = False

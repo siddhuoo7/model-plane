@@ -35,7 +35,27 @@ async def chat_completions(
     request_id = f"mp-{uuid.uuid4().hex[:12]}"
 
     # Headers → routing metadata
+    # Resolution order for tenant identity:
+    #   1. Explicit X-Tenant-Id header (highest priority — external callers)
+    #   2. JWT session token  (admin UI — sends Bearer <jwt>)
+    #   3. API key → owner_id lookup (curl / SDK callers using generated keys)
     tenant_id = request.headers.get("X-Tenant-Id")
+    if not tenant_id:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+            # Try JWT first (only valid JWTs have three dot-separated segments)
+            if token.count(".") == 2:
+                try:
+                    from model_plane.adapters.settings_router import _jwt_verify
+                    _session = _jwt_verify(token)
+                    tenant_id = _session.get("id") or None
+                except Exception as _jwt_exc:
+                    log.debug("jwt_identity_extraction_failed", error=str(_jwt_exc))
+            # Fall back to API key → owner_id map
+            if not tenant_id:
+                from model_plane.adapters.auth import resolve_key_owner
+                tenant_id = resolve_key_owner(token) or None
     session_id = request.headers.get("X-Session-Id")
     agent_type = request.headers.get("X-Agent-Type")
 

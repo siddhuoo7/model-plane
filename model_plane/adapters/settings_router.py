@@ -229,6 +229,12 @@ async def api_keys_create(
 
     db.save_api_key(kid, label, prefix, raw, time.time(), session.get("sub", ""), owner_id)
     _reload_api_keys_in_settings()
+    # Refresh the auth module's key→owner map so the new key is usable immediately.
+    try:
+        from model_plane.adapters.auth import _load_key_hashes
+        _load_key_hashes()
+    except Exception:
+        pass
 
     log.info("api_key_created", kid=kid, label=label, owner=session.get("sub", ""))
     return {"id": kid, "label": label, "key": raw, "prefix": prefix}
@@ -244,6 +250,11 @@ async def api_keys_delete(
     if not db.delete_api_key(key_id, owner_id):
         raise HTTPException(status_code=404, detail="Key not found")
     _reload_api_keys_in_settings()
+    try:
+        from model_plane.adapters.auth import _load_key_hashes
+        _load_key_hashes()
+    except Exception:
+        pass
     log.info("api_key_deleted", kid=key_id, owner=session.get("sub", ""))
 
 

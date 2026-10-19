@@ -668,6 +668,7 @@ def run_routing_pipeline(ctx: RoutingContext) -> RoutingDecision:
     if ctx.routing_source == "unset":
         ctx.routing_source = decision.source
     ctx.routing_confidence = decision.confidence
+    ctx.routing_reason = decision.reasoning or None
 
     log.info(
         "routing_decision",

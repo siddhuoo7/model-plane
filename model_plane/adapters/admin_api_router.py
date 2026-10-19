@@ -899,6 +899,7 @@ async def provider_test(
 
 @router.post("/simulate")
 async def simulate(
+    request: Request,
     body: dict[str, Any] = Body(...),
     _auth: AdminAuth = None,
 ) -> dict[str, Any]:
@@ -913,8 +914,12 @@ async def simulate(
     if not body.get("messages"):
         raise HTTPException(status_code=422, detail="'messages' field is required")
 
+    # Carry the caller's identity into the pipeline so per-user overrides
+    # (classifier selection, routing rules) are honoured in the simulation.
+    owner_id = _get_routing_owner(request)
+
     request_id = f"sim-{uuid.uuid4().hex[:8]}"
-    ctx = build_routing_context(body, request_id=request_id)
+    ctx = build_routing_context(body, request_id=request_id, tenant_id=owner_id or None)
 
     try:
         decision = run_routing_pipeline(ctx)
@@ -1842,7 +1847,6 @@ def _persist_classifier_config(owner_id: str = "") -> None:
         if key in _classifier_overrides:
             clf_cfg[f"{n}_enabled"] = _classifier_overrides[key]
 
-    # Save to SQLite for the active user (or global if unauthenticated)
     target_owner = owner_id or _GLOBAL_OWNER
     _db.save_routing_override("classifier", clf_cfg, target_owner)
     log.info("classifier_config_persisted", active=active, owner=target_owner)
@@ -2264,6 +2268,7 @@ async def compression_metrics(_auth: AdminAuth) -> dict[str, Any]:
     total_tokens_after = 0
     total_savings = 0
     profile_counts: dict[str, int] = {}
+    volatile_prompt_count = 0  # CacheAligner: requests with volatile system prompts
 
     for rec in all_recs:
         profile = rec.get("compression_profile") or "passthrough"
@@ -2272,6 +2277,9 @@ async def compression_metrics(_auth: AdminAuth) -> dict[str, Any]:
         savings = max(0, tb - ta)
 
         profile_counts[profile] = profile_counts.get(profile, 0) + 1
+
+        if (rec.get("volatile_tokens_found") or 0) > 0:
+            volatile_prompt_count += 1
 
         if tb > 0:
             total_tokens_before += tb
@@ -2298,4 +2306,5 @@ async def compression_metrics(_auth: AdminAuth) -> dict[str, Any]:
         "total_savings_tokens": total_savings,
         "overall_savings_pct": overall_savings_pct,
         "profile_distribution": profile_counts,
+        "volatile_system_prompt_count": volatile_prompt_count,
     }

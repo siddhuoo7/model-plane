@@ -80,10 +80,29 @@ export interface RequestRecord {
   cost_usd: number
   latency_ms: number
   score_breakdown?: Record<string, number>
+  raw_score?: number
+  scorer_tier?: string
+  // classifier + routing detail
+  classifier_source?: string
+  classifier_confidence?: number
+  classifier_tier?: string
+  classifier_signals?: Record<string, number>
+  routing_reason?: string
+  routing_source?: string
+  routing_confidence?: number
+  // feature detail
+  feature_tokens?: number
+  feature_has_tools?: boolean
+  feature_language?: string | null
   // security fields (filled by Stage 0.5 SecurityGuard)
   security_sensitivity?: string
   security_blocked?: string[]
   context_reuse_score?: number
+  // compression fields (filled by PreCallHook + CacheAligner)
+  tokens_before_compression?: number
+  tokens_after_compression?: number
+  compression_profile?: string
+  volatile_tokens_found?: number
 }
 
 export interface SecuritySummaryResponse {
@@ -548,6 +567,8 @@ export interface CompressionMetrics {
   total_savings_tokens: number
   overall_savings_pct: number
   profile_distribution: Record<string, number>
+  /** CacheAligner: number of requests where the system prompt contained volatile tokens */
+  volatile_system_prompt_count: number
 }
 
 export interface ApiKeyEntry {

@@ -25,6 +25,7 @@ import { LoadingState, ErrorState } from '../components/States'
 const PROFILE_META: Record<string, {
   label: string; badge: string; color: string
   what: string; input: string; output: string
+  detail?: string
 }> = {
   auto: {
     label: 'Auto',        badge: '🤖', color: '#24a148',
@@ -40,21 +41,24 @@ const PROFILE_META: Record<string, {
   },
   tool_output_compaction: {
     label: 'Tool Compaction', badge: '🔧', color: '#0f62fe',
-    what: 'Truncates oversized tool-call results (role: tool) to ≤800 tokens each.',
-    input: '[ …, { role:"tool", content: "…15 000 tokens…" } ]',
-    output: '[ …, { role:"tool", content: "…800 tokens…[truncated]" } ]',
+    what: 'JSON-aware truncation of oversized tool-call results (role: tool) to ≤800 tokens. Preserves array/object structure — arrays keep head + tail with an _omitted sentinel; dicts keep all keys with long values trimmed. Falls back to natural-boundary character truncation for non-JSON.',
+    input: '[ …, { role:"tool", content: "[{id:1,…}, …15 000 tokens…]" } ]',
+    output: '[ …, { role:"tool", content: "[{id:1,…},{_omitted:"18 items…"},{id:20,…}]" } ]',
+    detail: 'Idempotent via Freeze-on-First-Sight cache — same tool output compresses to identical bytes every turn, keeping the provider KV-cache prefix stable.',
   },
   conversation_summary: {
     label: 'Conv. Summary', badge: '📋', color: '#6929c4',
-    what: 'Drops middle turns to fit a token budget. Keeps system prompt + last 6 turns.',
-    input: '[ sys, u1, a1, u2, a2, …, u10, a10 ] — 12 000 tokens',
-    output: '[ sys, [summary placeholder], u9, a9, u10, a10 ] — ~3 000 tokens',
+    what: 'Drops middle turns verbatim (no rewriting). Pins turns with constraint language (must/never/required) and rare entities. Only drops if token savings exceed the cache re-priming break-even point.',
+    input: '[ sys, u1, a1, "You must never share the key", u3, …, u10, a10 ] — 12 000 tokens',
+    output: '[ sys, "You must never share the key", [… 7 turn(s) omitted — context is sufficient …], u9, a9, u10, a10 ]',
+    detail: 'Prompt-cache economics gate: only compresses when savings_fraction > 1.15 / (1.15 + 0.10 × remaining_turns). Assertive drop marker prevents model hedging.',
   },
   code_context_reduction: {
     label: 'Code Reduction', badge: '💻', color: '#00539a',
-    what: 'Truncates fenced code blocks (``` … ```) to first 40 lines each.',
-    input: '[ user: "…```python\\n<800 lines of code>\\n```…" ]',
-    output: '[ user: "…```python\\n<first 40 lines>\\n# [truncated]\\n```…" ]',
+    what: '3-level progressive compression of fenced code blocks: (1) strip comments, (2) strip function bodies → signatures only, (3) truncate to first 40 lines as last resort.',
+    input: '[ user: "…```python\\n# comment\\ndef foo(x):\\n    return x*2\\n…800 lines…\\n```…" ]',
+    output: '[ user: "…```python\\ndef foo(x):\\n    ...\\n```…" ]  (level 2)',
+    detail: 'Idempotent via block cache. Level 1 achieves 20–40% savings by stripping comments. Level 2 (aggressive=true by default) extracts signatures only for heavy files.',
   },
 }
 
@@ -149,22 +153,29 @@ function ProfilePicker({
 
         {/* Before / After example */}
         {profile !== 'auto' && (
-          <div style={{
-            background: '#fff', border: '1px solid #e0e0e0', borderRadius: 6,
-            padding: '0.75rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem',
-          }}>
-            <div>
-              <p style={{ margin: '0 0 0.375rem', fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#6f6f6f' }}>Before</p>
-              <code style={{ display: 'block', fontSize: '0.75rem', color: '#161616', background: '#f4f4f4', padding: '0.375rem 0.5rem', borderRadius: 4, whiteSpace: 'pre-wrap', wordBreak: 'break-all', lineHeight: 1.5 }}>
-                {meta.input}
-              </code>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{
+              background: '#fff', border: '1px solid #e0e0e0', borderRadius: 6,
+              padding: '0.75rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem',
+            }}>
+              <div>
+                <p style={{ margin: '0 0 0.375rem', fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#6f6f6f' }}>Before</p>
+                <code style={{ display: 'block', fontSize: '0.75rem', color: '#161616', background: '#f4f4f4', padding: '0.375rem 0.5rem', borderRadius: 4, whiteSpace: 'pre-wrap', wordBreak: 'break-all', lineHeight: 1.5 }}>
+                  {meta.input}
+                </code>
+              </div>
+              <div>
+                <p style={{ margin: '0 0 0.375rem', fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: meta.color }}>After</p>
+                <code style={{ display: 'block', fontSize: '0.75rem', color: meta.color, background: meta.color + '0d', padding: '0.375rem 0.5rem', borderRadius: 4, whiteSpace: 'pre-wrap', wordBreak: 'break-all', lineHeight: 1.5, border: `1px solid ${meta.color}30` }}>
+                  {meta.output}
+                </code>
+              </div>
             </div>
-            <div>
-              <p style={{ margin: '0 0 0.375rem', fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: meta.color }}>After</p>
-              <code style={{ display: 'block', fontSize: '0.75rem', color: meta.color, background: meta.color + '0d', padding: '0.375rem 0.5rem', borderRadius: 4, whiteSpace: 'pre-wrap', wordBreak: 'break-all', lineHeight: 1.5, border: `1px solid ${meta.color}30` }}>
-                {meta.output}
-              </code>
-            </div>
+            {meta.detail && (
+              <p style={{ margin: 0, fontSize: '0.75rem', color: '#525252', background: '#f4f4f4', padding: '0.5rem 0.625rem', borderRadius: 4, lineHeight: 1.5 }}>
+                ℹ️ {meta.detail}
+              </p>
+            )}
           </div>
         )}
         {profile === 'auto' && (
@@ -372,12 +383,34 @@ export default function CompressionPage() {
             </h3>
             {metrics ? (
               <>
+                {/* CacheAligner warning — shown only when volatile prompts detected */}
+                {(metrics.volatile_system_prompt_count ?? 0) > 0 && (
+                  <div style={{
+                    background: '#fff3cd', border: '1px solid #f1c21b', borderLeft: '4px solid #f1c21b',
+                    borderRadius: 6, padding: '0.75rem 1rem', marginBottom: '1rem',
+                    display: 'flex', gap: '0.625rem', alignItems: 'flex-start',
+                  }}>
+                    <span style={{ fontSize: '1rem', lineHeight: 1 }}>⚠️</span>
+                    <div>
+                      <p style={{ margin: '0 0 0.25rem', fontSize: '0.8125rem', fontWeight: 700, color: '#7d4e00' }}>
+                        CacheAligner: volatile system prompt tokens detected
+                      </p>
+                      <p style={{ margin: 0, fontSize: '0.75rem', color: '#7d4e00', lineHeight: 1.5 }}>
+                        {metrics.volatile_system_prompt_count} of the last {mTotal} requests had dynamic tokens
+                        (UUIDs, timestamps, JWTs, or hashes) in their system prompt. These rotate per-request and bust
+                        the provider KV-cache prefix even when the logical prompt is unchanged — increasing re-prefill cost.
+                        Consider moving dynamic values to a user or assistant turn.
+                      </p>
+                    </div>
+                  </div>
+                )}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(155px, 1fr))', gap: '0.875rem', marginBottom: '1.5rem' }}>
                   <StatCard label="Overall savings" value={`${metrics.overall_savings_pct}%`} sub={`${metrics.total_savings_tokens.toLocaleString()} tokens saved`} accent="#24a148" />
                   <StatCard label="Compressed" value={metrics.compressed_count} sub={`of ${mTotal} sampled`} accent="#0f62fe" />
                   <StatCard label="Cache skips" value={metrics.cache_skip_count} sub="prefix preserved" accent="#6929c4" />
                   <StatCard label="Tokens before" value={metrics.total_tokens_before.toLocaleString()} accent="#8d8d8d" />
                   <StatCard label="Tokens after"  value={metrics.total_tokens_after.toLocaleString()}  accent="#8d8d8d" />
+                  <StatCard label="Volatile prompts" value={metrics.volatile_system_prompt_count ?? 0} sub="KV-cache busters" accent={(metrics.volatile_system_prompt_count ?? 0) > 0 ? '#f1c21b' : '#8d8d8d'} />
                 </div>
                 {Object.keys(profileDist).length > 0 && (
                   <div>

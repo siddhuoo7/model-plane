@@ -79,6 +79,10 @@ def get_classifier(owner_id: str = "") -> "ClassifierAdapter | None":
     Always safe to call — returns ``None`` when no ML classifier is configured.
     """
     model = (settings.classifier_model or "regex").strip().lower()
+    # Track whether a DB row explicitly set the value. When it has, the
+    # backward-compat env-var alias must not override it — the admin's DB
+    # choice (even "regex") takes precedence over BERT_CLASSIFIER_ENABLED.
+    db_override_found = False
 
     # Check DB override if enabled/configured
     if getattr(settings, "db_overrides_enabled", True):
@@ -89,12 +93,16 @@ def get_classifier(owner_id: str = "") -> "ClassifierAdapter | None":
                     _clf_db = _db.load_routing_override("classifier", _k)
                     if _clf_db.get("active"):
                         model = str(_clf_db["active"]).strip().lower()
+                        db_override_found = True
                         break
         except Exception:
             pass
 
-    # Backward-compat: BERT_CLASSIFIER_ENABLED=true → mbert (if not already set)
-    if model == "regex" and getattr(settings, "bert_classifier_enabled", False):
+    # Backward-compat: BERT_CLASSIFIER_ENABLED=true → mbert.
+    # Only applies when no DB row has explicitly chosen a classifier; if the
+    # admin stored "regex" in the DB that is an intentional selection and must
+    # not be silently upgraded to mbert by the env-var alias.
+    if not db_override_found and model == "regex" and getattr(settings, "bert_classifier_enabled", False):
         model = "mbert"
 
     if model == "ml_task":

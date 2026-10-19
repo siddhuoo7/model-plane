@@ -67,10 +67,12 @@ class PreCallHook(litellm.CustomLogger):  # type: ignore[misc]
                 profile=profile,
                 task_type=task_type_val,
                 context_budget=kwargs.get("max_tokens", 4000),
+                context_reuse_score=ctx.context_reuse_score,
             )
             ctx.tokens_before_compression = result.tokens_before
             ctx.tokens_after_compression = result.tokens_after
             ctx.compression_profile = result.profile_used
+            ctx.volatile_tokens_found = result.volatile_tokens_found
 
             if result.savings > 0:
                 # Mutate messages in-place (LiteLLM passes the list by ref)
@@ -165,7 +167,6 @@ class PostCallHook(litellm.CustomLogger):  # type: ignore[misc]
                 "task_type": task_type_val,
                 "tenant_id": tenant_val,
                 "routing_source": ctx.routing_source,
-                "routing_confidence": round(ctx.routing_confidence or 0.0, 4),
                 "input_tokens": ctx.input_tokens,
                 "output_tokens": ctx.output_tokens,
                 "latency_ms": round(ctx.latency_ms, 1),
@@ -183,6 +184,36 @@ class PostCallHook(litellm.CustomLogger):  # type: ignore[misc]
                 "pii_types": list(ctx.security_ctx.pii_types) if ctx.security_ctx else [],
                 "secret_types": list(ctx.security_ctx.secret_types) if ctx.security_ctx else [],
                 "context_reuse_score": round(ctx.context_reuse_score, 3),
+                "volatile_tokens_found": ctx.volatile_tokens_found,
+                "tokens_before_compression": ctx.tokens_before_compression,
+                "tokens_after_compression": ctx.tokens_after_compression,
+                "compression_profile": ctx.compression_profile,
+                # Classifier + scorer detail for Request Explorer drill-down
+                "classifier_source": (
+                    {0.0: "regex", 1.0: "mbert", 2.0: "laya"}.get(
+                        float(ctx.classification.signals.get("_source", 0.0)), "regex"
+                    ) if ctx.classification else "regex"
+                ),
+                "classifier_confidence": round(ctx.classification.confidence, 4) if ctx.classification else None,
+                "classifier_tier": (
+                    ctx.classification.complexity_tier.value if ctx.classification else None
+                ),
+                "classifier_signals": (
+                    {k: v for k, v in ctx.classification.signals.items()
+                     if v > 0 and not k.startswith("_")}
+                    if ctx.classification else {}
+                ),
+                "routing_reason": getattr(ctx, "routing_reason", None),
+                "routing_confidence": round(ctx.routing_confidence or 0.0, 4),
+                "score_breakdown": (
+                    {k: round(v, 4) for k, v in ctx.scorer_result.dimension_scores.items()}
+                    if ctx.scorer_result else None
+                ),
+                "raw_score": round(ctx.scorer_result.raw_score, 4) if ctx.scorer_result else None,
+                "scorer_tier": ctx.scorer_result.tier.value if ctx.scorer_result else None,
+                "feature_tokens": ctx.features.total_tokens if ctx.features else 0,
+                "feature_has_tools": ctx.features.has_tools if ctx.features else False,
+                "feature_language": ctx.features.language_hint if ctx.features else None,
             }
             get_request_buffer().push(record)
             get_cost_accumulator().record(
