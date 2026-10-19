@@ -66,6 +66,10 @@ thresholds:
   complexity_score_simple: 0.25
   complexity_score_complex: 0.55
   complexity_score_reasoning: 0.75
+  # Classifier must reach this confidence to upgrade the scorer tier at blend step.
+  # Below this threshold the scorer tier wins. Prevents low-confidence mbert/laya
+  # guesses (e.g. 0.47 for a greeting) from overriding a clear scorer signal.
+  blend_min_confidence: 0.65
 ml_guards:
   upgrade_cap_conf: 0.8
   downgrade_veto_conf: 0.75

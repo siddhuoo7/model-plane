@@ -156,8 +156,21 @@ def run_routing_pipeline(ctx: RoutingContext) -> RoutingDecision:
     # Fixes the "two-brain" problem: a short code request scores SIMPLE by the
     # 14-dim scorer (no code blocks) but classifies CODE_GENERATION (COMPLEX).
     # Taking the max prevents silent under-routing on keyword-sparse prompts.
+    #
+    # Confidence guard: if the classifier confidence is below blend_min_confidence
+    # the classifier tier is ignored and only the scorer tier is used.  This
+    # prevents a low-confidence mbert/laya guess from overriding a clear scorer
+    # signal (e.g. simple_indicators=1.0 → scorer=SIMPLE should not be upgraded
+    # to COMPLEX by mbert guessing long_context_synthesis at 0.47 confidence).
+    _blend_min_conf: float = float(
+        routing_config.get("thresholds", {}).get("blend_min_confidence", 0.65)
+    )
+    _clf_confident = (
+        ctx.classification is not None
+        and ctx.classification.confidence >= _blend_min_conf
+    )
     scorer_rank = _TIER_RANK.get(ctx.scorer_result.tier.value, 1)
-    clf_rank = _TIER_RANK.get(ctx.classification.complexity_tier.value, 1)
+    clf_rank = _TIER_RANK.get(ctx.classification.complexity_tier.value, 1) if _clf_confident else scorer_rank
     blended_rank = max(scorer_rank, clf_rank)
     blended_tier = ComplexityTier(_RANK_TIER[blended_rank])
 

@@ -334,8 +334,6 @@ timestamp,query,task_type,tier,reasoning_markers,code_presence,simple_indicators
 2026-10-05T23:04:30.030006+00:00,"Analyze this 100,000-word document and identify themes",long_context_synthesis,complex,0.2,0.0,0.0,0.0,0.0,0.0015,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.030098+00:00,Summarize the entire codebase architecture across all files,long_context_synthesis,complex,0.0,0.0,0.0,0.0,0.1667,0.0014,0.0,0.0,0.0,0.3333,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.030172+00:00,Find all mentions of a topic throughout this 200-page PDF,long_context_synthesis,complex,0.0,0.0,0.0,0.0,0.0,0.0015,0.0,0.0,0.0,0.3333,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.030197+00:00,Hi there,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.030223+00:00,Good morning!,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.030258+00:00,Thanks for your help,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.030298+00:00,"Hey, how's it going?",simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.3333,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.030335+00:00,Tell me about yourself,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
@@ -569,25 +567,17 @@ This crashes with RecursionError for large inputs. Fix it.",code_debugging,compl
 2026-10-05T23:04:30.046050+00:00,"Analyze this 80,000 token transcript and extract all decisions made",long_context_synthesis,complex,0.2,0.0,0.0,0.0,0.0,0.0018,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046153+00:00,Compare the entire contents of these two large SQL dump files,long_context_synthesis,complex,0.0,0.0,0.0,0.0,0.0,0.0014,0.0,0.0,0.0,0.0,0.0,0.25,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046265+00:00,Go through this whole book chapter by chapter and create study notes,long_context_synthesis,complex,0.0,0.0,0.0,0.0,0.0,0.0015,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046292+00:00,Hey,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046314+00:00,Hi!,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046342+00:00,Hello there,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046368+00:00,Good afternoon,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046394+00:00,Good evening!,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046415+00:00,Howdy,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046452+00:00,"Hey, what's up?",simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.3333,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046474+00:00,Thanks!,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046508+00:00,Thank you so much,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046528+00:00,Greetings,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046554+00:00,"Okay, cool",simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046584+00:00,"Got it, thanks",simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046614+00:00,"Great, appreciate it",simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046648+00:00,Nice to meet you,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046677+00:00,Bye for now,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046706+00:00,See you later,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0004,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046746+00:00,"That's helpful, thank you",simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0008,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046765+00:00,Yep,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046784+00:00,Nope,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046808+00:00,Sure thing,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046848+00:00,What are you capable of?,simple_qa,simple,0.0,0.0,0.3333,0.0,0.0,0.0008,0.0,0.3333,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046904+00:00,What kinds of tasks can you help with?,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0011,0.0,0.3333,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
@@ -770,14 +760,11 @@ Help me fix all three.",code_debugging,complex,0.0,0.0,0.0,0.0,0.0,0.0041,0.0,0.
 2026-10-05T23:04:30.058028+00:00,Good day,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058049+00:00,Morning!,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058087+00:00,Thank you for your help,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0006,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.058116+00:00,Thanks a lot,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058139+00:00,Ok great,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058168+00:00,"Awesome, got it",simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.058192+00:00,Sounds good,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058211+00:00,Perfect,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058231+00:00,Alright,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058262+00:00,"Makes sense, thanks",simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.058279+00:00,OK,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058313+00:00,👍,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0004,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058359+00:00,What topics do you know about?,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0009,0.0,0.3333,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058408+00:00,Can you help me with data science?,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.001,0.0,0.3333,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
@@ -911,7 +898,6 @@ ZeroDivisionError at line 2. Fix this code to handle division by zero.",code_deb
 2026-10-05T23:04:30.067029+00:00,np,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.067048+00:00,lgtm,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0004,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.067079+00:00,"Cool, makes sense",simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.067102+00:00,Got it,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.067127+00:00,Understood,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.067152+00:00,Roger that,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.067180+00:00,k,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
@@ -1430,8 +1416,6 @@ Runtime error: integer divide by zero at main.go:3. Fix this.",code_debugging,co
 2026-10-05T23:04:30.030006+00:00,"Analyze this 100,000-word document and identify themes",long_context_synthesis,complex,0.2,0.0,0.0,0.0,0.0,0.0015,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.030098+00:00,Summarize the entire codebase architecture across all files,long_context_synthesis,complex,0.0,0.0,0.0,0.0,0.1667,0.0014,0.0,0.0,0.0,0.3333,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.030172+00:00,Find all mentions of a topic throughout this 200-page PDF,long_context_synthesis,complex,0.0,0.0,0.0,0.0,0.0,0.0015,0.0,0.0,0.0,0.3333,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.030197+00:00,Hi there,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.030223+00:00,Good morning!,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.030258+00:00,Thanks for your help,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.030298+00:00,"Hey, how's it going?",simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.3333,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.030335+00:00,Tell me about yourself,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
@@ -1665,25 +1649,17 @@ This crashes with RecursionError for large inputs. Fix it.",code_debugging,compl
 2026-10-05T23:04:30.046050+00:00,"Analyze this 80,000 token transcript and extract all decisions made",long_context_synthesis,complex,0.2,0.0,0.0,0.0,0.0,0.0018,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046153+00:00,Compare the entire contents of these two large SQL dump files,long_context_synthesis,complex,0.0,0.0,0.0,0.0,0.0,0.0014,0.0,0.0,0.0,0.0,0.0,0.25,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046265+00:00,Go through this whole book chapter by chapter and create study notes,long_context_synthesis,complex,0.0,0.0,0.0,0.0,0.0,0.0015,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046292+00:00,Hey,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046314+00:00,Hi!,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046342+00:00,Hello there,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046368+00:00,Good afternoon,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046394+00:00,Good evening!,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046415+00:00,Howdy,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046452+00:00,"Hey, what's up?",simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.3333,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046474+00:00,Thanks!,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046508+00:00,Thank you so much,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046528+00:00,Greetings,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046554+00:00,"Okay, cool",simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046584+00:00,"Got it, thanks",simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046614+00:00,"Great, appreciate it",simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046648+00:00,Nice to meet you,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046677+00:00,Bye for now,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046706+00:00,See you later,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0004,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046746+00:00,"That's helpful, thank you",simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0008,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046765+00:00,Yep,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.046784+00:00,Nope,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046808+00:00,Sure thing,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046848+00:00,What are you capable of?,simple_qa,simple,0.0,0.0,0.3333,0.0,0.0,0.0008,0.0,0.3333,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.046904+00:00,What kinds of tasks can you help with?,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0011,0.0,0.3333,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
@@ -1866,14 +1842,11 @@ Help me fix all three.",code_debugging,complex,0.0,0.0,0.0,0.0,0.0,0.0041,0.0,0.
 2026-10-05T23:04:30.058028+00:00,Good day,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058049+00:00,Morning!,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058087+00:00,Thank you for your help,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0006,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.058116+00:00,Thanks a lot,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058139+00:00,Ok great,simple_qa,simple,0.0,0.0,0.85,0.0,0.0,0.05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058168+00:00,"Awesome, got it",simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.058192+00:00,Sounds good,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058211+00:00,Perfect,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058231+00:00,Alright,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058262+00:00,"Makes sense, thanks",simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.058279+00:00,OK,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058313+00:00,👍,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0004,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058359+00:00,What topics do you know about?,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0009,0.0,0.3333,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.058408+00:00,Can you help me with data science?,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.001,0.0,0.3333,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
@@ -2007,7 +1980,6 @@ ZeroDivisionError at line 2. Fix this code to handle division by zero.",code_deb
 2026-10-05T23:04:30.067029+00:00,np,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.067048+00:00,lgtm,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0004,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.067079+00:00,"Cool, makes sense",simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
-2026-10-05T23:04:30.067102+00:00,Got it,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.067127+00:00,Understood,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.067152+00:00,Roger that,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
 2026-10-05T23:04:30.067180+00:00,k,simple_qa,simple,0.0,0.0,0.0,0.0,0.0,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,ok,False,1.0,strata_classifier_training,0.90
@@ -2191,3 +2163,64 @@ Runtime error: integer divide by zero at main.go:3. Fix this.",code_debugging,co
 2026-08-01T09:06:00.000000+00:00,Summarise this paragraph in two sentences,summarization,medium,0.0,0.0,0.4,0.0,0.0,0.15,0.0,0.0,0.1,0.3,0.1,0.0,0.0,0.0,local-qwen-27b-medium,900.0,0.0,ok,False,1.0,local_vllm_synthetic,0.88
 2026-10-07T15:35:30.904274+00:00,shadow-5fe75ce7,simple_qa,simple,0.0,0.0,0.3333333333333333,0.0,0.0,0.000875,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,bedrock-nova-micro,1431.295,3.605e-06,,False,,,
 2026-10-19T08:39:06.381799+00:00,shadow-6e172792,unknown,medium,0.0,0.0,0.0,0.0,0.0,0.000125,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-mistral-large,616.798,7.123199999999998e-05,,False,,,
+2026-10-01T00:00:00+00:00,hi,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:01:00+00:00,Hi,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:02:00+00:00,hi!,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:03:00+00:00,Hi!,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:04:00+00:00,Hey,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:05:00+00:00,hey,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:06:00+00:00,Hello,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:07:00+00:00,hello,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:08:00+00:00,hello!,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:09:00+00:00,hi there,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:10:00+00:00,Hi there,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:11:00+00:00,hey there,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:12:00+00:00,Hey there,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:13:00+00:00,hello there,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:14:00+00:00,Hello there,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:15:00+00:00,good morning,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:16:00+00:00,Good morning,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:17:00+00:00,good morning!,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:18:00+00:00,good afternoon,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:19:00+00:00,Good afternoon,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:20:00+00:00,good evening,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:21:00+00:00,Good evening,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:22:00+00:00,thanks,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:23:00+00:00,Thanks,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:24:00+00:00,thank you,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:25:00+00:00,Thank you,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:26:00+00:00,thanks!,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:27:00+00:00,thanks a lot,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:28:00+00:00,Thanks a lot,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:29:00+00:00,ok,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:30:00+00:00,OK,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:31:00+00:00,okay,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:32:00+00:00,Okay,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:33:00+00:00,ok thanks,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:34:00+00:00,OK thanks,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:35:00+00:00,got it,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:36:00+00:00,Got it,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:37:00+00:00,sounds good,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:38:00+00:00,Sounds good,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:39:00+00:00,bye,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:40:00+00:00,Bye,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:41:00+00:00,goodbye,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:42:00+00:00,Goodbye,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:43:00+00:00,bye!,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:44:00+00:00,Bye!,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:45:00+00:00,sure,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:46:00+00:00,Sure,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:47:00+00:00,yep,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:48:00+00:00,nope,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:49:00+00:00,yes,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:50:00+00:00,no,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:51:00+00:00,what time is it,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:52:00+00:00,What time is it?,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:53:00+00:00,how are you,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:54:00+00:00,How are you?,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:55:00+00:00,how are you doing,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:56:00+00:00,How are you doing?,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:57:00+00:00,what's up,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:58:00+00:00,What's up?,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T00:59:00+00:00,nice to meet you,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
+2026-10-01T01:00:00+00:00,Nice to meet you,simple_qa,simple,0.0,0.0,0.90,0.0,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,watsonx-granite-small,220.0,0.000003,ok,False,1.0,curated_simple_greetings,1.0
