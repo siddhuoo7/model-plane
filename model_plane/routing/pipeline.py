@@ -169,6 +169,11 @@ def run_routing_pipeline(ctx: RoutingContext) -> RoutingDecision:
         ctx.classification is not None
         and ctx.classification.confidence >= _blend_min_conf
     )
+    # Capture pre-blend values before any mutation so the hook records them accurately.
+    ctx.scorer_tier_pre_blend = ctx.scorer_result.tier.value
+    ctx.clf_tier_pre_blend = ctx.classification.complexity_tier.value if ctx.classification else None
+    ctx.blend_clf_used = _clf_confident
+
     scorer_rank = _TIER_RANK.get(ctx.scorer_result.tier.value, 1)
     clf_rank = _TIER_RANK.get(ctx.classification.complexity_tier.value, 1) if _clf_confident else scorer_rank
     blended_rank = max(scorer_rank, clf_rank)

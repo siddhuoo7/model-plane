@@ -210,7 +210,13 @@ class PostCallHook(litellm.CustomLogger):  # type: ignore[misc]
                     if ctx.scorer_result else None
                 ),
                 "raw_score": round(ctx.scorer_result.raw_score, 4) if ctx.scorer_result else None,
-                "scorer_tier": ctx.scorer_result.tier.value if ctx.scorer_result else None,
+                # Use pre-blend value so the UI shows what the scorer originally said,
+                # not the mutated value after blending.
+                "scorer_tier": getattr(ctx, "scorer_tier_pre_blend", None) or (
+                    ctx.scorer_result.tier.value if ctx.scorer_result else None
+                ),
+                "blend_clf_used": getattr(ctx, "blend_clf_used", True),
+                "clf_tier_pre_blend": getattr(ctx, "clf_tier_pre_blend", None),
                 "feature_tokens": ctx.features.total_tokens if ctx.features else 0,
                 "feature_has_tools": ctx.features.has_tools if ctx.features else False,
                 "feature_language": ctx.features.language_hint if ctx.features else None,

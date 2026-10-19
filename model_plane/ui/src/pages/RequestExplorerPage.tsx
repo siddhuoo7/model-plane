@@ -226,8 +226,19 @@ function PipelineTab({ rec }: { rec: RequestRecord }) {
       <div>
         <div style={{ fontSize: '0.6rem', fontWeight: 700, color: '#8d8d8d', letterSpacing: '0.08em', marginBottom: '0.375rem' }}>STEP 4 — BLEND</div>
         <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: '#161616' }}>
-          max({rec.scorer_tier ?? '—'}, {rec.classifier_tier ?? '—'}) → <strong>{rec.tier ?? '—'}</strong>
+          {rec.blend_clf_used === false ? (
+            <>
+              scorer({rec.scorer_tier ?? '—'}) <span style={{ color: '#8d8d8d' }}>clf suppressed (low conf)</span> → <strong>{rec.tier ?? '—'}</strong>
+            </>
+          ) : (
+            <>max({rec.scorer_tier ?? '—'}, {rec.clf_tier_pre_blend ?? rec.classifier_tier ?? '—'}) → <strong>{rec.tier ?? '—'}</strong></>
+          )}
         </span>
+        {rec.blend_clf_used === false && (
+          <div style={{ fontSize: '0.68rem', color: '#6f6f6f', marginTop: '0.2rem' }}>
+            Classifier ({rec.clf_tier_pre_blend ?? rec.classifier_tier ?? '—'}) ignored — confidence {rec.classifier_confidence?.toFixed(2) ?? '—'} below threshold
+          </div>
+        )}
       </div>
 
       {/* Step 7 — Winner */}

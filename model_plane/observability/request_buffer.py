@@ -53,6 +53,9 @@ class RequestRingBuffer:
             log.warning("request_buffer_load_failed", error=str(exc))
 
     def push(self, record: dict[str, Any]) -> None:
+        # Always keep "id" as a stable alias for "request_id" so UI lookups work.
+        if "id" not in record and "request_id" in record:
+            record["id"] = record["request_id"]
         with self._lock:
             self._buf.append(record)
 

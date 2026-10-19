@@ -72,6 +72,12 @@ class RoutingContext:
     escalated: bool = False
     final_success: bool | None = None
 
+    # blend step bookkeeping — set before the in-place mutation so hooks can
+    # record what each brain said independently of the final blended outcome.
+    scorer_tier_pre_blend: str | None = None     # scorer tier before step 3.5 mutates it
+    clf_tier_pre_blend: str | None = None        # classifier tier at blend time
+    blend_clf_used: bool = True                  # False when confidence guard suppressed clf
+
     # ML shadow / tier resolver
     ml_recommended_deployment: str | None = None
     ml_recommendation_confidence: float = 0.0

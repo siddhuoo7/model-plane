@@ -81,7 +81,9 @@ export interface RequestRecord {
   latency_ms: number
   score_breakdown?: Record<string, number>
   raw_score?: number
-  scorer_tier?: string
+  scorer_tier?: string           // pre-blend scorer tier
+  blend_clf_used?: boolean       // false = confidence guard suppressed the classifier
+  clf_tier_pre_blend?: string    // classifier tier at blend time
   // classifier + routing detail
   classifier_source?: string
   classifier_confidence?: number

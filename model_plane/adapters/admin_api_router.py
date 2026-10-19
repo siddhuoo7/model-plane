@@ -179,6 +179,11 @@ async def admin_requests(
         task_type=task_type,
         tenant_id=tenant_id,
     )
+    # Ensure every record has an "id" field (alias for "request_id") so the
+    # UI RequestRecord.id resolves correctly for feedback and row-keying.
+    for rec in records:
+        if "id" not in rec and "request_id" in rec:
+            rec["id"] = rec["request_id"]
     return {
         "count": len(records),
         "total_buffered": len(buf),
